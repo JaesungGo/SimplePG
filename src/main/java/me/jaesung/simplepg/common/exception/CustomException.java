@@ -55,4 +55,32 @@ public class CustomException extends RuntimeException {
 
     }
 
+    /**
+     * API 인증 권한 없음 (401 Unauthorized)
+     */
+    public static class ApiAuthenticationException extends CustomException {
+        public ApiAuthenticationException(String message) {
+            super(ErrorCode.UNAUTHORIZED, message);
+        }
+    }
+
+    /**
+     * Api 헤더 없음 (400 Bad Request)
+     */
+    public static class MissingApiHeaderException extends CustomException {
+        public MissingApiHeaderException(String message) {
+            super(ErrorCode.INVALID_REQUEST, message);
+        }
+    }
+
+    /**
+     * 요청 기간 만료 (408 Request Timeout)
+     */
+    public static class ExpiredRequestException extends CustomException {
+        public ExpiredRequestException(String message) {
+            super(ErrorCode.REQUEST_TIMEOUT, message);
+        }
+    }
+
+
 }
