@@ -2,6 +2,7 @@ package me.jaesung.simplepg.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.multipart.MultipartResolver;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.*;
 @EnableWebMvc
 @Configuration
 @PropertySource({"classpath:/application.properties"})
+@ComponentScan(basePackages = "me.jaesung.simplepg.controller")
 public class ServletConfig implements WebMvcConfigurer {
 
     @Value("${server.URI}")
@@ -24,11 +26,11 @@ public class ServletConfig implements WebMvcConfigurer {
                 .addResourceLocations("/resources/assets/");
     }
 
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "http://" + base_uri)
-                .allowCredentials(true)
+                .allowedOrigins("*")
                 .allowedMethods("*")
                 .allowedHeaders("*");
     }
