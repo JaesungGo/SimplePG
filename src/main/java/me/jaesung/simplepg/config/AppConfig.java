@@ -20,13 +20,7 @@ import javax.sql.DataSource;
 @Slf4j
 @PropertySource({"classpath:/application.properties"})
 @MapperScan(basePackages = "me.jaesung.**.mapper")
-@ComponentScan(
-        basePackages = "me.jaesung.simplepg",
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.ANNOTATION,
-                value = Controller.class
-        )
-)
+@ComponentScan(basePackages = "me.jaesung.simplepg.**")
 @EnableTransactionManagement
 public class AppConfig {
 
