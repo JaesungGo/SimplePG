@@ -1,25 +1,32 @@
 package me.jaesung.simplepg.controller.api;
 
-import me.jaesung.simplepg.domain.dto.ApiCredentialRequest;
-import me.jaesung.simplepg.domain.dto.ApiCredentialResponse;
 import me.jaesung.simplepg.service.auth.ApiCredentialService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/api-credentials")
+@RequestMapping("/api/v2")
 public class ApiKeyController {
 
-    private final ApiCredentialService apiCredentialService;
-
-    public ApiKeyController(ApiCredentialService apiCredentialService) {
-        this.apiCredentialService = apiCredentialService;
+    @PostMapping("/endpoint")
+    public ResponseEntity<Map<String, Object>> protectedEndpoint(@RequestBody Map<String, Object> requestBody) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "인증된 POST 요청이 성공적으로 처리되었습니다");
+        response.put("receivedData", requestBody);
+        return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<String> validCredential(@RequestBody ApiCredentialRequest request){
-        apiCredentialService.isValidApiCredential(request.getCliendId());
-        return ResponseEntity.ok("Success");
+    @GetMapping("/resource")
+    public ResponseEntity<Map<String, Object>> protectedResource() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "인증된 GET 요청이 성공적으로 처리되었습니다");
+        response.put("data", Collections.singletonMap("resource", "보호된 리소스 데이터"));
+        return ResponseEntity.ok(response);
     }
 }
