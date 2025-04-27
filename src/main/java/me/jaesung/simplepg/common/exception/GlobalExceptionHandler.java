@@ -17,14 +17,30 @@ public class GlobalExceptionHandler {
     /**
      * Api 예외 처리 핸들러
      */
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex, WebRequest request) {
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, WebRequest request) {
 
         ErrorCode errorCode = ex.getErrorCode();
         HttpStatus status = errorCode.getHttpStatus();
         String path = getRequestURI(request);
 
-        log.error("Custom exception occurred: status={}, URI={}",
+        log.error("Api exception occurred: status={}, URI={}",
+                status, path, ex);
+
+        ErrorResponse errorResponse = ErrorResponse.of(status.value(), ex.getMessage(), path);
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    /**
+     * Payment 관련 예외 처리 핸들러
+     */
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException ex, WebRequest request){
+        ErrorCode errorCode = ex.getErrorCode();
+        HttpStatus status = errorCode.getHttpStatus();
+        String path = getRequestURI(request);
+
+        log.error("Payment exception occurred: status={}, URI={}",
                 status, path, ex);
 
         ErrorResponse errorResponse = ErrorResponse.of(status.value(), ex.getMessage(), path);
@@ -75,4 +91,5 @@ public class GlobalExceptionHandler {
         }
         return "";
     }
+
 }
