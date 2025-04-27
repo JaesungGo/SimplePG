@@ -1,4 +1,4 @@
-package me.jaesung.simplepg.domain.vo;
+package me.jaesung.simplepg.domain.vo.payment;
 
 import lombok.Getter;
 
@@ -9,7 +9,7 @@ public class PaymentLog {
     private Long lodId;
     private String paymentId;
     private PaymentLogAction action;
-    private PaymentLogStatus status;
+    private PaymentStatus status;
     private String details;
     private LocalDateTime createdAt;
 }
