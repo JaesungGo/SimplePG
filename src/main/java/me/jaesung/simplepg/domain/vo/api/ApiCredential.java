@@ -1,4 +1,4 @@
-package me.jaesung.simplepg.domain.vo;
+package me.jaesung.simplepg.domain.vo.api;
 
 import lombok.Getter;
 

@@ -1,10 +1,10 @@
 package me.jaesung.simplepg.common.util.filter;
 
-import me.jaesung.simplepg.common.exception.CustomException;
+import me.jaesung.simplepg.common.exception.ApiException;
 import me.jaesung.simplepg.common.util.HmacUtil;
-import me.jaesung.simplepg.domain.dto.ApiCredentialResponse;
-import me.jaesung.simplepg.domain.vo.ApiStatus;
-import me.jaesung.simplepg.service.auth.ApiCredentialService;
+import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
+import me.jaesung.simplepg.domain.vo.api.ApiStatus;
+import me.jaesung.simplepg.service.api.ApiCredentialService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,7 +72,7 @@ class ApiAuthenticationFilterTest {
         request.setRequestURI("/api/v2/test");
 
         //then
-        assertThrows(CustomException.MissingApiHeaderException.class, () -> {
+        assertThrows(ApiException.MissingApiHeaderException.class, () -> {
             filter.doFilterInternal(request, response, filterChain);
         });
     }

@@ -1,11 +1,10 @@
 package me.jaesung.simplepg.common.util.filter;
 
-import me.jaesung.simplepg.common.exception.CustomException;
+import me.jaesung.simplepg.common.exception.ApiException;
 import me.jaesung.simplepg.common.util.HmacUtil;
-import me.jaesung.simplepg.domain.dto.ApiCredentialResponse;
-import me.jaesung.simplepg.domain.vo.ApiCredential;
-import me.jaesung.simplepg.domain.vo.ApiStatus;
-import me.jaesung.simplepg.service.auth.ApiCredentialService;
+import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
+import me.jaesung.simplepg.domain.vo.api.ApiStatus;
+import me.jaesung.simplepg.service.api.ApiCredentialService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -43,16 +42,16 @@ public class ApiAuthenticationFilter extends OncePerRequestFilter {
         String signature = request.getHeader("X-SIGNATURE");
 
         if (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(timestamp) || StringUtils.isEmpty(signature)) {
-            throw new CustomException.MissingApiHeaderException("header parameter(s) is(are) required");
+            throw new ApiException.MissingApiHeaderException("header parameter(s) is(are) required");
         }
 
         if (!HmacUtil.isTimestampValid(timestamp, validatesMinutes)) {
-            throw new CustomException.ExpiredRequestException("Request timestamp has expired");
+            throw new ApiException.ExpiredRequestException("Request timestamp has expired");
         }
 
         ApiCredentialResponse credential = apiCredentialService.findByClientId(clientId);
         if (credential == null || !ApiStatus.ACTIVE.equals(credential.getStatus())) {
-            throw new CustomException.ApiAuthenticationException("Invalid API credential");
+            throw new ApiException.ApiAuthenticationException("Invalid API credential");
         }
 
         String requestBody = getRequestBody(request);
@@ -63,7 +62,7 @@ public class ApiAuthenticationFilter extends OncePerRequestFilter {
         try {
             String generatedWithDataToSign = HmacUtil.generateSignature(dataToSign, credential.getClientSecret());
             if (!generatedWithDataToSign.equals(signature)) {
-                throw new CustomException.ApiAuthenticationException("Invalid signature");
+                throw new ApiException.ApiAuthenticationException("Invalid signature");
             }
 
             filterChain.doFilter(request, response);

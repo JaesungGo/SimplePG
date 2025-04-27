@@ -1,9 +1,9 @@
-package me.jaesung.simplepg.domain.dto;
+package me.jaesung.simplepg.domain.dto.api;
 
 import lombok.Builder;
 import lombok.Data;
-import me.jaesung.simplepg.domain.vo.ApiCredential;
-import me.jaesung.simplepg.domain.vo.ApiStatus;
+import me.jaesung.simplepg.domain.vo.api.ApiCredential;
+import me.jaesung.simplepg.domain.vo.api.ApiStatus;
 
 import java.time.LocalDateTime;
 
