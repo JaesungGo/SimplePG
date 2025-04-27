@@ -84,6 +84,9 @@ dependencies {
     implementation("org.springframework.security:spring-security-config:${springSecurityVersion}")
     implementation("org.springframework.security:spring-security-core:${springSecurityVersion}")
     implementation("org.springframework.security:spring-security-taglibs:${springSecurityVersion}")
+
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'commons-codec:commons-codec:1.15'
 }
 
 war {
