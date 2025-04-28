@@ -1,4 +1,4 @@
-package me.jaesung.simplepg.domain.dto;
+package me.jaesung.simplepg.domain.dto.api;
 
 import lombok.Data;
 

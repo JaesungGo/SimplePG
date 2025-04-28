@@ -10,7 +10,8 @@ public enum ErrorCode {
     UNAUTHORIZED("Authentication failed", HttpStatus.UNAUTHORIZED),
     NOT_FOUND("Resource not found", HttpStatus.NOT_FOUND),
     INTERNAL_SERVER_ERROR("An unexpected error", HttpStatus.INTERNAL_SERVER_ERROR),
-    REQUEST_TIMEOUT("Request Timeout", HttpStatus.REQUEST_TIMEOUT);
+    REQUEST_TIMEOUT("Request Timeout", HttpStatus.REQUEST_TIMEOUT),
+    KEY_CONFLICT("Key Conflict", HttpStatus.CONFLICT);
 
     private final String message;
     private final HttpStatus httpStatus;
@@ -19,5 +20,4 @@ public enum ErrorCode {
         this.message = message;
         this.httpStatus = httpStatus;
     }
-
 }

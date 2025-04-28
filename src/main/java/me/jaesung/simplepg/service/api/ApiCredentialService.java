@@ -1,9 +1,9 @@
-package me.jaesung.simplepg.service.auth;
+package me.jaesung.simplepg.service.api;
 
 import lombok.extern.slf4j.Slf4j;
-import me.jaesung.simplepg.domain.dto.ApiCredentialResponse;
-import me.jaesung.simplepg.domain.vo.ApiCredential;
-import me.jaesung.simplepg.domain.vo.ApiStatus;
+import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
+import me.jaesung.simplepg.domain.vo.api.ApiCredential;
+import me.jaesung.simplepg.domain.vo.api.ApiStatus;
 import me.jaesung.simplepg.mapper.ApiCredentialMapper;
 import org.springframework.stereotype.Service;
 

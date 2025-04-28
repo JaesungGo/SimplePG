@@ -1,6 +1,5 @@
 package me.jaesung.simplepg.controller.api;
 
-import me.jaesung.simplepg.service.auth.ApiCredentialService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
