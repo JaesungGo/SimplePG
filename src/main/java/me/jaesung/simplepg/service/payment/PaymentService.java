@@ -3,10 +3,7 @@ package me.jaesung.simplepg.service.payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jaesung.simplepg.common.exception.PaymentException;
-import me.jaesung.simplepg.domain.dto.payment.PaymentDTO;
-import me.jaesung.simplepg.domain.dto.payment.PaymentLogDTO;
-import me.jaesung.simplepg.domain.dto.payment.PaymentRequest;
-import me.jaesung.simplepg.domain.dto.payment.PaymentResponse;
+import me.jaesung.simplepg.domain.dto.payment.*;
 import me.jaesung.simplepg.domain.vo.payment.MethodCode;
 import me.jaesung.simplepg.domain.vo.payment.PaymentLogAction;
 import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,7 +36,7 @@ public class PaymentService {
         validateMethodCode(request);
 
         try {
-            PaymentDTO paymentDTO = createPayment(request,amountBD);
+            PaymentDTO paymentDTO = createPayment(request, amountBD);
             PaymentLogDTO paymentLogDTO = createPaymentLog(paymentDTO.getPaymentId());
 
             paymentMapper.insertPayment(paymentDTO);
@@ -55,7 +53,16 @@ public class PaymentService {
 
     }
 
-    private PaymentDTO createPayment(PaymentRequest request,BigDecimal amountBD) {
+    @Transactional
+    public PaymentInfoDTO getPaymentStatus(String paymentKey) {
+        PaymentDTO paymentDTO = paymentMapper.findByPaymentKey(paymentKey)
+                .orElseThrow(() -> new PaymentException.InvalidPaymentRequestException("결제 정보를 찾을 수 없습니다:" + paymentKey));
+
+        log.info("결제 상태 체크: {}, 현재 상태: {}", paymentKey, paymentDTO.getStatus().toString());
+        return PaymentInfoDTO.of(paymentDTO);
+    }
+
+    private PaymentDTO createPayment(PaymentRequest request, BigDecimal amountBD) {
         String paymentId = String.valueOf(UUID.randomUUID());
         String orderNo = request.getOrderNo();
         String paymentKey = createPaymentKey(orderNo);
@@ -80,7 +87,7 @@ public class PaymentService {
                 .paymentId(paymentId)
                 .status(PaymentStatus.READY)
                 .action(PaymentLogAction.CREATE)
-                .details(paymentId + "생성")
+                .details("paymentID: " + paymentId + " 생성")
                 .createdAt(LocalDateTime.now())
                 .build();
     }

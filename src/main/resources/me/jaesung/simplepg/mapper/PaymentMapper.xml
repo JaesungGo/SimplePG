@@ -13,4 +13,8 @@
         SELECT EXISTS(SELECT 1 FROM PAYMENT WHERE order_no = #{orderNo})
     </select>
 
+    <select id="findByPaymentKey" parameterType="string" resultType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
+        SELECT * FROM PAYMENT WHERE payment_key = #{paymentKey}
+    </select>
+
 </mapper>
