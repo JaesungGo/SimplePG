@@ -10,7 +10,7 @@
     </insert>
 
     <select id="existsByOrderNo" parameterType="string" resultType="boolean">
-        SELECT EXISTS( SELECT 1 FROM PAYMENT WHERE order_no = #{orderNo})
+        SELECT EXISTS(SELECT 1 FROM PAYMENT WHERE order_no = #{orderNo})
     </select>
 
 </mapper>

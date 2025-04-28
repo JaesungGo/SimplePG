@@ -5,8 +5,8 @@
 <mapper namespace="me.jaesung.simplepg.mapper.PaymentLogMapper">
 
     <insert id="insertPaymentLog" parameterType="me.jaesung.simplepg.domain.dto.payment.PaymentLogDTO">
-        INSERT INTO PAYMENT_LOG (payment_id, action, status, details,created_at)
-        VALUES (#{paymentId},#{action},#{status},#{details},#{createdAt]})
+        INSERT INTO PAYMENT_LOG (payment_id, action, status, details, created_at)
+        VALUES (#{paymentId},#{action},#{status},#{details},#{createdAt})
     </insert>
 
 

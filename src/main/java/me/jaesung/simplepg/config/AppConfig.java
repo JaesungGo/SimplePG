@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 @Configuration
 @Slf4j
 @PropertySource({"classpath:/application.properties"})
-@MapperScan(basePackages = "me.jaesung.**.mapper")
+@MapperScan(basePackages = "me.jaesung.simplepg.mapper")
 @ComponentScan(basePackages = "me.jaesung.simplepg.**")
 @EnableTransactionManagement
 public class AppConfig {
