@@ -36,4 +36,12 @@ public class PaymentException extends RuntimeException{
     public static class ProcessingException extends PaymentException{
         public ProcessingException(String message) {super(ErrorCode.INTERNAL_SERVER_ERROR, message);}
     }
+
+    public static class ExternalPaymentException extends PaymentException{
+        public ExternalPaymentException(String message) {super(ErrorCode.BAD_GATEWAY, message);}
+    }
+
+    public static class WebhookProcessingException extends PaymentException{
+        public WebhookProcessingException(String message) {super(ErrorCode.INTERNAL_SERVER_ERROR, message);}
+    }
 }

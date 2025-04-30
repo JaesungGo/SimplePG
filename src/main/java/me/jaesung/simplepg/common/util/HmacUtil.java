@@ -1,5 +1,6 @@
 package me.jaesung.simplepg.common.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
@@ -17,7 +18,7 @@ public class HmacUtil {
     private static final String ALGORITHM = "HmacSHA256";
 
     public static String generateSignature(String data, String secretKey) throws Exception {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), ALGORITHM);
         Mac mac = Mac.getInstance(ALGORITHM);
         mac.init(secretKeySpec);
         byte[] hmacData = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));

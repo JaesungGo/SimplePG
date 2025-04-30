@@ -3,6 +3,7 @@ package me.jaesung.simplepg.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.netty.channel.ChannelOption;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -10,11 +11,16 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 import javax.sql.DataSource;
+import java.time.Duration;
 
 @Configuration
 @Slf4j
@@ -68,6 +74,20 @@ public class AppConfig {
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
+
+    /**
+     * 연결 타임 아웃 : 5초 (RTT의 2~3배 권장)
+     * 응답 타임 아웃 : 60초
+     */
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                        .responseTimeout(Duration.ofMillis(60000))))
+                .build();
+    }
+
 
 
 }

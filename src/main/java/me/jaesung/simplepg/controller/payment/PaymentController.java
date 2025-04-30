@@ -1,4 +1,4 @@
-package me.jaesung.simplepg.controller;
+package me.jaesung.simplepg.controller.payment;
 
 import lombok.RequiredArgsConstructor;
 import me.jaesung.simplepg.domain.dto.payment.PaymentInfoDTO;
@@ -24,7 +24,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{paymentKey}")
-    public ResponseEntity<PaymentInfoDTO> getPaymentStatus(@PathVariable String paymentKey){
+    public ResponseEntity<PaymentInfoDTO> getPaymentStatus(@PathVariable String paymentKey) {
         PaymentInfoDTO paymentStatus = paymentService.getPaymentStatus(paymentKey);
         return ResponseEntity.ok(paymentStatus);
     }

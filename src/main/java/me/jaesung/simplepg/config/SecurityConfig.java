@@ -1,9 +1,6 @@
 package me.jaesung.simplepg.config;
 
 import lombok.extern.slf4j.Slf4j;
-import me.jaesung.simplepg.common.util.filter.ApiAuthenticationFilter;
-import me.jaesung.simplepg.service.auth.ApiCredentialService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
