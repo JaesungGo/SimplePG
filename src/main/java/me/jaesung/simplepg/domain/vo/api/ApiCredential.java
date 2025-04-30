@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 public class ApiCredential {
     private String clientId;
     private String clientSecret;
-    private String name;
+    private String clientName;
     private ApiStatus status;
+    private String returnUrl;
     private LocalDateTime createdAt;
 }

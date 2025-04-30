@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class ApiCredentialRequest {
-    private String cliendId;
+    private String clientId;
     private String clientSecret;
     private String active;
+    private String clientName;
+    private String returnUrl;
 }
