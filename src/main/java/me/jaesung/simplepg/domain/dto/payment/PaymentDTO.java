@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Data @Builder
 public class PaymentDTO {
     private String paymentId;
+    private String clientId;
     private String paymentKey;
     private String orderNo;
     private BigDecimal amount;
@@ -25,5 +26,4 @@ public class PaymentDTO {
     private String transactionId;
     private LocalDateTime createdAt;
     private LocalDateTime approvedAt;
-
 }

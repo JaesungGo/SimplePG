@@ -11,4 +11,6 @@ public interface PaymentMapper {
     boolean existsByOrderNo(String orderNo);
 
     Optional<PaymentDTO> findByPaymentKey(String paymentKey);
+
+    void updatePayment(PaymentDTO paymentDTO);
 }

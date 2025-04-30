@@ -8,13 +8,13 @@ import lombok.Data;
 @Builder
 public class PaymentResponse {
 
-    private String paymentId;
+    private String paymentKey;
     private String status;
     private String createdAt;
 
     public static PaymentResponse of(PaymentDTO paymentDTO) {
         return PaymentResponse.builder()
-                .paymentId(paymentDTO.getPaymentId())
+                .paymentKey(paymentDTO.getPaymentKey())
                 .status(paymentDTO.getStatus().toString())
                 .createdAt(paymentDTO.getCreatedAt().toString())
                 .build();

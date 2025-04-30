@@ -8,11 +8,12 @@ import java.time.LocalDateTime;
 @Getter
 public class Payment {
     private String paymentId;
+    private String clientId;
     private String paymentKey;
     private String orderNo;
     private BigDecimal amount;
     private PaymentStatus status;
-    private String methodCode;
+    private MethodCode methodCode;
     private String productName;
     private String customerName;
     private String transactionId;

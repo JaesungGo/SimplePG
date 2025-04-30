@@ -6,6 +6,7 @@ import lombok.Data;
 @Data @Builder
 public class PaymentInfoDTO {
     String paymentKey;
+    String clientId;
     String orderNo;
     String status;
     String amount;
@@ -17,6 +18,7 @@ public class PaymentInfoDTO {
     public static PaymentInfoDTO of(PaymentDTO paymentDTO) {
         return PaymentInfoDTO.builder()
                 .paymentKey(paymentDTO.getPaymentKey())
+                .clientId(paymentDTO.getClientId())
                 .orderNo(paymentDTO.getOrderNo())
                 .status(paymentDTO.getStatus().toString())
                 .amount(paymentDTO.getAmount().toString())

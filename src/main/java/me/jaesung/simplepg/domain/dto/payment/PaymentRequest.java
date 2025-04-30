@@ -8,6 +8,9 @@ import javax.validation.constraints.Pattern;
 @Data
 public class PaymentRequest {
 
+    @NotBlank(message = "가맹점 ID는 필수입니다")
+    private String clientId;
+
     @NotBlank(message = "주문 번호는 필수입니다")
     private String orderNo;
 

@@ -9,25 +9,28 @@ import me.jaesung.simplepg.domain.vo.payment.PaymentLogAction;
 import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
 import me.jaesung.simplepg.mapper.PaymentLogMapper;
 import me.jaesung.simplepg.mapper.PaymentMapper;
+import me.jaesung.simplepg.service.webclient.WebClientService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentService {
 
     private final PaymentMapper paymentMapper;
     private final PaymentLogMapper paymentLogMapper;
+    private final WebClientService webClientService;
 
     @Transactional
     public PaymentResponse createPaymentAndLog(PaymentRequest request) {
+
+        validateClientId(request);
 
         validateOrderNo(request);
 
@@ -43,6 +46,8 @@ public class PaymentService {
             paymentLogMapper.insertPaymentLog(paymentLogDTO);
 
             log.debug("결제 요청 생성 성공: paymentId = {}", paymentDTO.getPaymentId());
+
+            webClientService.sendRequest(paymentDTO);
 
             return PaymentResponse.of(paymentDTO);
 
@@ -71,6 +76,7 @@ public class PaymentService {
 
         return PaymentDTO.builder()
                 .paymentId(paymentId)
+                .clientId(request.getClientId())
                 .paymentKey(paymentKey)
                 .orderNo(orderNo)
                 .amount(amountBD)
@@ -98,6 +104,14 @@ public class PaymentService {
         String data = orderNo + ":" + timeStamp + ":" + randomSalt;
 
         return DigestUtils.sha256Hex(data);
+    }
+
+    private void validateClientId(PaymentRequest request){
+        String clientId = request.getClientId();
+
+        if(clientId == null || clientId.trim().isEmpty()){
+            throw new PaymentException.InvalidPaymentRequestException("클라이언트 ID는 필수입니다");
+        }
     }
 
     /**

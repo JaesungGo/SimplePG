@@ -5,8 +5,10 @@
 <mapper namespace="me.jaesung.simplepg.mapper.PaymentMapper">
 
     <insert id="insertPayment" parameterType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
-        INSERT INTO PAYMENT (payment_id, payment_key, order_no, amount, status, method_code, product_name, customer_name, created_at)
-        VALUES(#{paymentId},#{paymentKey},#{orderNo},#{amount},#{status},#{methodCode},#{productName},#{customerName},#{createdAt});
+        INSERT INTO PAYMENT (payment_id, payment_key, client_id, order_no, amount, status, method_code, product_name,
+                             customer_name, created_at)
+        VALUES (#{paymentId}, #{paymentKey}, #{clientId}, #{orderNo}, #{amount}, #{status}, #{methodCode},
+                #{productName}, #{customerName}, #{createdAt});
     </insert>
 
     <select id="existsByOrderNo" parameterType="string" resultType="boolean">
@@ -16,5 +18,10 @@
     <select id="findByPaymentKey" parameterType="string" resultType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
         SELECT * FROM PAYMENT WHERE payment_key = #{paymentKey}
     </select>
+
+    <update id="updatePayment" parameterType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
+        UPDATE PAYMENT SET status = #{status}, approved_at = #{approvedAt}, transaction_id = #{transactionId} WHERE payment_id = #{paymentId}
+    </update>
+
 
 </mapper>
