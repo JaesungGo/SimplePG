@@ -13,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.*;
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @ComponentScan(basePackages = "me.jaesung.simplepg.controller")
+@ComponentScan(basePackages = "me.jaesung.simplepg.service")
 public class ServletConfig implements WebMvcConfigurer {
 
     @Value("${server.URI}")
