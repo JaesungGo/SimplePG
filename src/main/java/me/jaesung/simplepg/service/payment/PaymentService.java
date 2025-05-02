@@ -32,6 +32,8 @@ public class PaymentService {
 
         validateClientId(request);
 
+        paymentMapper.lockByOrderNo(request.getOrderNo());
+
         validateOrderNo(request);
 
         BigDecimal amountBD = validateAmount(request);
@@ -60,7 +62,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentInfoDTO getPaymentStatus(String paymentKey) {
-        PaymentDTO paymentDTO = paymentMapper.findByPaymentKey(paymentKey)
+        PaymentDTO paymentDTO = paymentMapper.findByPaymentKeyWithLock(paymentKey)
                 .orElseThrow(() -> new PaymentException.InvalidPaymentRequestException("결제 정보를 찾을 수 없습니다:" + paymentKey));
 
         log.info("결제 상태 체크: {}, 현재 상태: {}", paymentKey, paymentDTO.getStatus().toString());
