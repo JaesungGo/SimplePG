@@ -15,13 +15,17 @@
         SELECT EXISTS(SELECT 1 FROM PAYMENT WHERE order_no = #{orderNo})
     </select>
 
-    <select id="findByPaymentKey" parameterType="string" resultType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
-        SELECT * FROM PAYMENT WHERE payment_key = #{paymentKey}
+    <select id="findByPaymentKeyWithLock" parameterType="string" resultType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
+        SELECT * FROM PAYMENT WHERE payment_key = #{paymentKey} FOR UPDATE;
     </select>
 
     <update id="updatePayment" parameterType="me.jaesung.simplepg.domain.dto.payment.PaymentDTO">
         UPDATE PAYMENT SET status = #{status}, approved_at = #{approvedAt}, transaction_id = #{transactionId} WHERE payment_id = #{paymentId}
     </update>
+
+    <select id="lockByOrderNo" parameterType="string" resultType="boolean">
+        SELECT 1 FROM PAYMENT WHERE order_no = #{orderNo} FOR UPDATE
+    </select>
 
 
 </mapper>
