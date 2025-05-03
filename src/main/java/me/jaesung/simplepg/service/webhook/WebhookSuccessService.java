@@ -29,7 +29,7 @@ public class WebhookSuccessService extends WebhookServiceImpl {
 
     @Override
     protected void validatePayment(PaymentDTO paymentDTO, WebhookRequest webhookRequest) {
-        if (!webhookRequest.getPaymentStatus().equals(PaymentStatus.APPROVED.name().toString())) {
+        if (!webhookRequest.getPaymentStatus().equals(PaymentStatus.APPROVED.name())) {
             throw new PaymentException.WebhookProcessingException("외부 Status 정보가 서버의 정보와 다릅니다");
         }
     }
