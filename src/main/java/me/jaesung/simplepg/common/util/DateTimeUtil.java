@@ -17,7 +17,7 @@ public class DateTimeUtil {
     }
 
     private static final DateTimeFormatter ISO_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS");
 
     public static LocalDateTime parseIso(String dateTimeStr) {
         return LocalDateTime.parse(dateTimeStr, ISO_FORMATTER);
