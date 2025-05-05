@@ -3,8 +3,6 @@
 > 간편하게 결제 요청 및 승인 처리를 할 수 있는 **경량형 PG 백엔드 서비스**입니다.   
 > 가맹점 등록부터 결제 승인, 결제 로그 기록, 외부 Webhook 처리까지의 흐름을 구현했습니다.
 
----
-
 ## 📌 프로젝트 요약
 
 | 항목 | 내용 |
@@ -18,7 +16,7 @@
 
 ---
 
-## 🧠 구현 배경 및 목표
+## 🧠 구현 목표
 
 - **HMAC 인증 흐름 이해 및 구현**  
   단순 토큰 방식이 아닌 `secret key`를 통한 시그니처 검증을 구현해 실제 PG처럼 동작하도록 설계
@@ -51,32 +49,32 @@
 
 ```bash
 simplepg/
- ├── common/
- │   ├── exception/
- │   ├── util/
- │   ├── filter/
- │   └── interceptor/
- ├── config/
- ├── controller/
- │   ├── api/
- │   ├── mock/
- │   ├── payment/
- │   └── webhook/
- ├── domain/
- │   ├── dto/
- │   │   ├── api/
- │   │   ├── payment/
- │   │   └── webhook/
- │   └── vo/
- │       ├── api/
- │       ├── payment/
- │       └── webhook/
- ├── mapper/
- ├── service/
- │   ├── api/
- │   ├── payment/
- │   ├── webclient/
- └── └── webhook/
+ ├── common/                            # 공통 유틸리티 및 예외 처리와 관련된 모듈
+ │   ├── exception/                     # 커스텀 예외 클래스 및 예외 처리 로직 
+ │   ├── util/                          # 전역적으로 사용되는 유틸리티 클래스 
+ │   └── filter/                        # 요청 필터링 및 보안 관련 필터 클래스
+ │                
+ ├── config/                            # 스프링 설정 파일 및 빈 등록 관련 클래스
+ ├── controller/                        # REST API 및 웹훅 처리 컨트롤러 모음
+ │   ├── api/                           # API 인증 및 설정 관련 컨트롤러
+ │   ├── mock/                          # 외부 결제 시스템 모의(mock) 컨트롤러
+ │   ├── payment/                       # 결제 요청 및 상태 조회 관련 컨트롤러
+ │   └── webhook/                       # 웹훅 요청 처리 컨트롤러
+ ├── domain/                            # 도메인 객체 및 데이터 전송 객체(DTO) 정의
+ │   ├── dto/                           # 데이터 전송 객체(DTO) 모음
+ │   │   ├── api/                       # API 인증 및 응답 관련 DTO
+ │   │   ├── payment/                   # 결제 요청/응답 관련 DTO
+ │   │   └── webhook/                   # 웹훅 요청/응답 관련 DTO
+ │   └── vo/                            # 값 객체(Value Object) 모음
+ │       ├── api/                       # API 인증 객체 
+ │       ├── payment/                   # 결제 관련 값 객체
+ │       └── webhook/                   # 웹훅 관련 값 객체
+ ├── mapper/                            # MyBatis를 위한 SQL 매핑 인터페이스 및 XML 파일
+ ├── service/                           # 비즈니스 로직 처리 계층
+ │   ├── api/                           # API 인증 및 관리 서비스
+ │   ├── payment/                       # 결제 처리 및 상태 관리 관련 서비스
+ │   ├── webclient/                     # WebClient를 사용한 외부 API 호출 서비스
+ └── └── webhook/                       # 웹훅 수신 및 처리 관련 서비스
 ```
 
 ---
@@ -103,3 +101,16 @@ simplepg/
 - `BASE_URL`: `http://localhost:8080`
 - `CLIENT_ID`: 가맹점 등록 후 발급받은 ID
 - `SECRET_KEY`: 가맹점 등록 후 발급받은 Secret
+
+---
+## 📌 향후 계획 및 회고
+
+- 가맹점 back-office 개발 (관리자 인증, 결제 조회, 통계)
+- 결제 취소 및 재시도 로직 구현
+- 분산 환경에서의 Redis 분산 락 구현
+
+  <aside>
+
+실제 서비스에는 미치지 못하겠지만, 전체적인 턴 키 방식의 결제 서비스 동작 흐름을 이해하기 위해 진행하였습니다. 프로젝트를 통해 결제 시스템의 핵심은 보안과 데이터 **무결성**, 그리고 장애 대응 능력이라는 점을 깨달았습니다. 특히 동시성 제어와 분산 환경에서의 **데이터 일관성 유지**는 실제 서비스에서 계속 고민해야 할 부분이라는 생각이 들었습니다.
+
+</aside>
