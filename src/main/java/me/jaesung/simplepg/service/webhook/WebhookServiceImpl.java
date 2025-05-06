@@ -30,7 +30,7 @@ public abstract class WebhookServiceImpl implements WebhookService {
             PaymentDTO paymentDTO = paymentMapper.findByPaymentKeyWithLock(paymentKey)
                     .orElseThrow(() -> new PaymentException.InvalidPaymentRequestException("결제 정보를 찾을 수 없습니다"));
 
-            if (paymentDTO.getStatus() == PaymentStatus.READY) {
+            if (paymentDTO.getStatus() != PaymentStatus.READY) {
                 throw new PaymentException.InvalidPaymentRequestException("이미 처리된 결제 내역 입니다");
             }
 
