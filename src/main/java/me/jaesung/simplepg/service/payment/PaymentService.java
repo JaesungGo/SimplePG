@@ -69,6 +69,39 @@ public class PaymentService {
         return PaymentInfoDTO.of(paymentDTO);
     }
 
+    
+    /**
+     * 결제 상태 전이 유효성 검증 메소드
+     * 허용된 상태 전이만 가능하도록 제한
+     */
+    private void validatePaymentStatusTransition(PaymentStatus currentStatus, PaymentStatus targetStatus) {
+        boolean isValid = false;
+        
+        switch (currentStatus) {
+            case READY:
+                isValid = targetStatus == PaymentStatus.APPROVED ||
+                          targetStatus == PaymentStatus.FAILED ||
+                          targetStatus == PaymentStatus.CANCELED;
+                break;
+            case APPROVED:
+                isValid = targetStatus == PaymentStatus.COMPLETED ||
+                          targetStatus == PaymentStatus.CANCELED;
+                break;
+            case COMPLETED:
+                isValid = targetStatus == PaymentStatus.CANCELED;
+                break;
+            case FAILED:
+            case CANCELED:
+                isValid = false;
+                break;
+        }
+        
+        if (!isValid) {
+            throw new PaymentException.InvalidPaymentRequestException(
+                    String.format("유효하지 않은 상태 전이입니다: %s → %s", currentStatus, targetStatus));
+        }
+    }
+
     private PaymentDTO createPayment(PaymentRequest request, BigDecimal amountBD) {
         String paymentId = String.valueOf(UUID.randomUUID());
         String orderNo = request.getOrderNo();
