@@ -19,4 +19,6 @@ public class ExternalApiDTO {
     private String methodCode;
     private String successUrl;
     private String failureUrl;
+    private String transactionId;
+    private String cancelReason;
 }

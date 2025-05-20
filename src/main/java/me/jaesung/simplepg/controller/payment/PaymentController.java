@@ -19,14 +19,28 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<PaymentResponse> createPayment(@RequestBody @Valid PaymentRequest paymentRequest) {
-        PaymentResponse paymentAndLog = paymentService.createPaymentAndLog(paymentRequest);
-        return ResponseEntity.ok(paymentAndLog);
+        PaymentResponse paymentResponse = paymentService.createPaymentAndLog(paymentRequest);
+        return ResponseEntity.ok(paymentResponse);
     }
 
     @GetMapping("/{paymentKey}")
     public ResponseEntity<PaymentInfoDTO> getPaymentStatus(@PathVariable String paymentKey) {
         PaymentInfoDTO paymentStatus = paymentService.getPaymentStatus(paymentKey);
         return ResponseEntity.ok(paymentStatus);
+    }
+
+    @PostMapping("/{paymentKey}/cancel")
+    public ResponseEntity<PaymentInfoDTO> cancelPayment(
+            @PathVariable String paymentKey,
+            @RequestParam(required = false) String cancelReason) {
+        PaymentInfoDTO canceledPayment = paymentService.cancelPayment(paymentKey, cancelReason);
+        return ResponseEntity.ok(canceledPayment);
+    }
+
+    @PostMapping("/{paymentKey}/complete")
+    public ResponseEntity<PaymentInfoDTO> completePayment(@PathVariable String paymentKey) {
+        PaymentInfoDTO completedPayment = paymentService.completePayment(paymentKey);
+        return ResponseEntity.ok(completedPayment);
     }
 
 }
