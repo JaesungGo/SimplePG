@@ -69,6 +69,110 @@ public class PaymentService {
         return PaymentInfoDTO.of(paymentDTO);
     }
 
+    /**
+     * 결제 취소 처리 메소드
+     * 결제 상태가 APPROVED 또는 COMPLETED인 경우에만 취소 가능
+     */
+    @Transactional
+    public PaymentInfoDTO cancelPayment(String paymentKey, String cancelReason) {
+
+        PaymentDTO paymentDTO = paymentMapper.findByPaymentKeyWithLock(paymentKey)
+                .orElseThrow(() -> new PaymentException.InvalidPaymentRequestException("결제 정보를 찾을 수 없습니다:" + paymentKey));
+
+        validatePaymentStatusTransition(paymentDTO.getStatus(), PaymentStatus.CANCELED);
+
+        try {
+            webClientService.sendCancelRequest(paymentDTO, cancelReason);
+
+            paymentDTO.setStatus(PaymentStatus.CANCELED);
+
+            PaymentLogDTO paymentLogDTO = PaymentLogDTO.builder()
+                    .paymentId(paymentDTO.getPaymentId())
+                    .action(PaymentLogAction.CANCEL)
+                    .status(PaymentStatus.CANCELED)
+                    .details("결제 취소 처리되었습니다. " + (cancelReason != null ? "사유: " + cancelReason : ""))
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            paymentMapper.updatePayment(paymentDTO);
+            paymentLogMapper.insertPaymentLog(paymentLogDTO);
+
+            log.info("결제 취소 성공: paymentKey={}, 취소사유={}", paymentKey, cancelReason);
+
+            return PaymentInfoDTO.of(paymentDTO);
+        } catch (Exception e) {
+            log.error("결제 취소 중 오류 발생: {}", e.getMessage(), e);
+            throw new PaymentException.ProcessingException("결제 취소 처리 중 오류가 발생했습니다");
+        }
+    }
+
+    /**
+     * 결제 완료 처리 메소드
+     * APPROVED 상태의 결제만 COMPLETED로 변경 가능
+     */
+    @Transactional
+    public PaymentInfoDTO completePayment(String paymentKey) {
+
+        PaymentDTO paymentDTO = paymentMapper.findByPaymentKeyWithLock(paymentKey)
+                .orElseThrow(() -> new PaymentException.InvalidPaymentRequestException("결제 정보를 찾을 수 없습니다:" + paymentKey));
+
+        validatePaymentStatusTransition(paymentDTO.getStatus(), PaymentStatus.COMPLETED);
+
+        try {
+            paymentDTO.setStatus(PaymentStatus.COMPLETED);
+
+            PaymentLogDTO paymentLogDTO = PaymentLogDTO.builder()
+                    .paymentId(paymentDTO.getPaymentId())
+                    .action(PaymentLogAction.COMPLETE)
+                    .status(PaymentStatus.COMPLETED)
+                    .details("결제가 완료 처리되었습니다.")
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            paymentMapper.updatePayment(paymentDTO);
+            paymentLogMapper.insertPaymentLog(paymentLogDTO);
+
+            log.info("결제 완료 처리 성공: paymentKey={}", paymentKey);
+
+            return PaymentInfoDTO.of(paymentDTO);
+        } catch (Exception e) {
+            log.error("결제 완료 처리 중 오류 발생: {}", e.getMessage(), e);
+            throw new PaymentException.ProcessingException("결제 완료 처리 중 오류가 발생했습니다");
+        }
+    }
+    
+    /**
+     * 결제 상태 전이 유효성 검증 메소드
+     * 허용된 상태 전이만 가능하도록 제한
+     */
+    private void validatePaymentStatusTransition(PaymentStatus currentStatus, PaymentStatus targetStatus) {
+        boolean isValid = false;
+        
+        switch (currentStatus) {
+            case READY:
+                isValid = targetStatus == PaymentStatus.APPROVED ||
+                          targetStatus == PaymentStatus.FAILED ||
+                          targetStatus == PaymentStatus.CANCELED;
+                break;
+            case APPROVED:
+                isValid = targetStatus == PaymentStatus.COMPLETED ||
+                          targetStatus == PaymentStatus.CANCELED;
+                break;
+            case COMPLETED:
+                isValid = targetStatus == PaymentStatus.CANCELED;
+                break;
+            case FAILED:
+            case CANCELED:
+                isValid = false;
+                break;
+        }
+        
+        if (!isValid) {
+            throw new PaymentException.InvalidPaymentRequestException(
+                    String.format("유효하지 않은 상태 전이입니다: %s → %s", currentStatus, targetStatus));
+        }
+    }
+
     private PaymentDTO createPayment(PaymentRequest request, BigDecimal amountBD) {
         String paymentId = String.valueOf(UUID.randomUUID());
         String orderNo = request.getOrderNo();

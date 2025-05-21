@@ -23,18 +23,25 @@ public class WebClientService {
 
     private final String requestApiUrl;
     private final String returnUrl;
+    private final String cancelUrl;
     private final WebClient webClient;
     private final ApiCredentialMapper apiCredentialMapper;
 
     public WebClientService(@Value("${api.request.url}") String requestApiUrl,
                             @Value("${api.return.url}") String returnUrl,
+                            @Value("${api.request.url}/cancel}") String cancelUrl,
                             WebClient webClient, ApiCredentialMapper apiCredentialMapper) {
         this.requestApiUrl = requestApiUrl;
         this.returnUrl = returnUrl;
+        this.cancelUrl = cancelUrl;
         this.webClient = webClient;
         this.apiCredentialMapper = apiCredentialMapper;
     }
 
+    /**
+     * 외부 결제 시스템으로 결제 요청
+     * @param paymentDTO
+     */
     public void sendRequest(PaymentDTO paymentDTO) {
 
         ExternalApiDTO externalApiDTO = ExternalApiDTO.builder()
@@ -59,7 +66,46 @@ public class WebClientService {
                         }
                 );
     }
+    
+    /**
+     * 외부 결제 시스템으로 결제 취소 요청 전송
+     * @param paymentDTO 취소할 결제 정보
+     * @param cancelReason 취소 사유(옵션)
+     * @throws PaymentException.ExternalPaymentException 외부 API 호출 실패 시
+     */
+    public void sendCancelRequest(PaymentDTO paymentDTO, String cancelReason) {
+        try {
+            log.info("결제 취소 요청 전송: paymentKey={}, transactionId={}", 
+                    paymentDTO.getPaymentKey(), paymentDTO.getTransactionId());
+            
+            ExternalApiDTO cancelRequest = ExternalApiDTO.builder()
+                    .paymentKey(paymentDTO.getPaymentKey())
+                    .transactionId(paymentDTO.getTransactionId())
+                    .amount(paymentDTO.getAmount().toString())
+                    .orderNo(paymentDTO.getOrderNo())
+                    .cancelReason(cancelReason != null ? cancelReason : "고객 요청에 의한 취소")
+                    .build();
+            
+            // 동기 방식으로 요청 처리 - 취소는 즉시 응답이 필요함
+            String response = webClient.post()
+                    .uri(cancelUrl)
+                    .bodyValue(cancelRequest)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            
+            log.debug("결제 취소 응답: {}", response);
+        } catch (Exception e) {
+            log.error("결제 취소 요청 실패: {}", e.getMessage(), e);
+            throw new PaymentException.ExternalPaymentException("외부 결제 시스템으로 취소 요청 실패: " + e.getMessage());
+        }
+    }
 
+    /**
+     * 가맹점 서버에 웹훅 응답 전송
+     * @param webhookResponse
+     * @throws Exception
+     */
     public void sendResponse(WebhookResponse webhookResponse) throws Exception {
 
         String data = plusBody(webhookResponse);
