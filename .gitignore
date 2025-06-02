@@ -17,8 +17,10 @@ out/
 !**/src/test/**/out/
 
 ### 주요 정보
-application.properties
+.properties
 .env
+
+!application.properties.template
 
 ### Eclipse ###
 .apt_generated

@@ -27,6 +27,11 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
+
+    - name: 'template -> application.properties 변환'
+      run: |
+        cp src/main/resources/application.properties.template src/main/resources/application.properties
+        echo "application.properties 설정 파일 생성 완료"
         
     - name: 'gradlew 실행 권한 부여'
       run: chmod +x gradlew

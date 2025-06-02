@@ -98,12 +98,8 @@ dependencies {
 war {
     webAppDirName = 'src/main/webapp'
     archiveBaseName = 'SimplePG'
-    archiveVersion = "1.0.0"
-
-    from('src/main/resources') {
-        include 'application-azure.properties'
-        into 'WEB-INF/classes'
-    }
+    archiveVersion = '1.0.0'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 test {

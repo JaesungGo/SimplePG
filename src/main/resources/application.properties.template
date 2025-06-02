@@ -1,0 +1,47 @@
+# 실제 사용 시 이 파일을 application.properties로 복사하여 사용하세요
+
+# Active Profile
+spring.profiles.active=${SPRING_PROFILES_ACTIVE:local}
+
+# Application Info
+app.name=SimplePG
+app.version=1.0.0
+app.environment=${APP_ENVIRONMENT:local}
+
+# Database Configuration (환경변수에서 주입)
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:your_database}?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+spring.datasource.username=${MYSQL_USERNAME:your_username}
+spring.datasource.password=${MYSQL_PASSWORD:your_password}
+
+# Connection Pool
+spring.datasource.hikari.maximum-pool-size=${DB_POOL_SIZE:5}
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.connection-timeout=20000
+
+# API Settings
+api.key.header=X-API-KEY
+api.signature.header=X-API-SIGNATURE
+api.key.validity.minutes=5
+api.key.hmac.algorithm=HmacSHA256
+
+# Payment Settings
+payment.request.expiry.minutes=30
+payment.vbank.expiry.days=3
+
+# Encryption (실제 키는 환경변수에서 주입)
+encryption.algorithm=AES/GCM/NoPadding
+encryption.aes.key=${ENCRYPTION_KEY:your_encryption_key_here}
+
+# API URLs (실제 URL은 환경변수에서 주입)
+api.request.url=${API_REQUEST_URL:http://localhost:8080/SimplePG/mock/request}
+api.return.url=${API_RETURN_URL:http://localhost:8080/SimplePG/api/protected/webhook}
+
+# Settlement Schedule
+settlement.daily.job.cron=0 0 3 * * ?
+settlement.weekly.job.cron=0 0 3 ? * MON
+settlement.monthly.job.cron=0 0 3 1 * ?
+
+# Logging
+logging.level.me.jaesung=INFO
+logging.level.org.springframework=WARN
