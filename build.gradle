@@ -16,13 +16,13 @@ ext {
     slf4jVersion = '1.7.36'
     log4j2Version = '2.17.2'
     jacksonVersion = '2.13.4'
-    mysqlVersion = '5.1.49'
+    mysqlVersion = '8.0.33'
     mybatisVersion = '3.5.9'
     mybatisSpringVersion = '2.0.7'
     springSecurityVersion = '5.8.13'
     lombokVersion = '1.18.30'
     junitVersion = '5.9.2'
-    hikariVersion = '2.7.4'
+    hikariVersion = '4.0.3'
     jstlVersion = '1.2'
 }
 
@@ -97,6 +97,13 @@ dependencies {
 
 war {
     webAppDirName = 'src/main/webapp'
+    archiveBaseName = 'SimplePG'
+    archiveVersion = "1.0.0"
+
+    from('src/main/resources') {
+        include 'application-azure.properties'
+        into 'WEB-INF/classes'
+    }
 }
 
 test {
