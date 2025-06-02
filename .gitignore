@@ -17,9 +17,9 @@ out/
 !**/src/test/**/out/
 
 ### 주요 정보
-.properties
+build.gradle
+*.properties
 .env
-
 !application.properties.template
 
 ### Eclipse ###
