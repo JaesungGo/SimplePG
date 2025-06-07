@@ -34,8 +34,8 @@ encryption.algorithm=AES/GCM/NoPadding
 encryption.aes.key=${ENCRYPTION_KEY:your_encryption_key_here}
 
 # API URLs (실제 URL은 환경변수에서 주입)
-api.request.url=${API_REQUEST_URL:http://localhost:8080/SimplePG/mock/request}
-api.return.url=${API_RETURN_URL:http://localhost:8080/SimplePG/api/protected/webhook}
+api.request.url=${API_REQUEST_URL:http://localhost:8080/mock/request}
+api.return.url=${API_RETURN_URL:http://localhost:8080/api/protected/webhook}
 
 # Settlement Schedule
 settlement.daily.job.cron=0 0 3 * * ?

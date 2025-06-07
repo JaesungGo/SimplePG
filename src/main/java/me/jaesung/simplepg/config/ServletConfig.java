@@ -12,6 +12,8 @@ import org.springframework.web.servlet.config.annotation.*;
 @EnableWebMvc
 @Configuration
 @PropertySource({"classpath:/application.properties"})
+@PropertySource(value = "classpath:application-${spring.profiles.active}.properties",
+        ignoreResourceNotFound = true)
 @ComponentScan(basePackages = "me.jaesung.simplepg.controller")
 @ComponentScan(basePackages = "me.jaesung.simplepg.service")
 public class ServletConfig implements WebMvcConfigurer {

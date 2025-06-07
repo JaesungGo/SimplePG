@@ -25,6 +25,8 @@ import java.time.Duration;
 @Configuration
 @Slf4j
 @PropertySource({"classpath:/application.properties"})
+@PropertySource(value = "classpath:application-${spring.profiles.active}.properties",
+        ignoreResourceNotFound = true)
 @MapperScan(basePackages = "me.jaesung.simplepg.mapper")
 @ComponentScan(basePackages = "me.jaesung.simplepg.**")
 @EnableTransactionManagement
