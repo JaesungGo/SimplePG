@@ -14,7 +14,11 @@ permissions:
 env:
   JAVA_VERSION: '17'
   AZURE_WEBAPP_NAME: 'simplepg-backend'
-
+  
+permissions:
+  id-token: write
+  contents: read
+  
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
