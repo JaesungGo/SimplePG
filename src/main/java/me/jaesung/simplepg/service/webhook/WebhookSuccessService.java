@@ -37,14 +37,14 @@ public class WebhookSuccessService extends WebhookServiceImpl {
     @Override
     protected void processPaymentStatus(PaymentDTO paymentDTO, WebhookRequest webhookRequest) {
         paymentDTO.setStatus(PaymentStatus.APPROVED);
-        paymentDTO.setApprovedAt(DateTimeUtil.parseIso(webhookRequest.getApprovedAt()));
+        paymentDTO.setApprovedAt(LocalDateTime.parse(webhookRequest.getApprovedAt()));
         paymentDTO.setTransactionId(webhookRequest.getTransactionId());
 
         PaymentLogDTO paymentLogDTO = PaymentLogDTO.builder()
                 .paymentId(paymentDTO.getPaymentId())
                 .action(PaymentLogAction.APPROVE)
                 .status(PaymentStatus.APPROVED)
-                .details("승인된 결제 내역입니다(승인 일시:" + LocalDateTime.now())
+                .details("승인된 결제 내역입니다(승인 일시:" + LocalDateTime.now()+ ")")
                 .build();
 
         paymentMapper.updatePayment(paymentDTO);
