@@ -1,4 +1,4 @@
-# 💳 PG 결제 서비스 (SimplePG MVP)
+# 💳 PG 결제 서비스 (SimplePG MVP) [![SimplePG 결제 API 배포(Azure)](https://github.com/JaesungGo/SimplePG/actions/workflows/main_simplepg-backend.yml/badge.svg)](https://github.com/JaesungGo/SimplePG/actions/workflows/main_simplepg-backend.yml)
 
 > 간편하게 결제 요청 및 승인 처리를 할 수 있는 **경량형 PG 백엔드 서비스**입니다.   
 > 가맹점 등록부터 결제 승인, 결제 로그 기록, 외부 Webhook 처리까지의 흐름을 구현했습니다.
@@ -92,12 +92,40 @@ simplepg/
 ---
 ## 테스트 방법
 
-### Postman 테스트 리소스
+### 🔐 보안 고려사항
+- 실제 설정 파일들은 `.gitignore`에 의해 제외됩니다
+- 민감한 정보는 환경변수를 통해 주입됩니다
+
+### 1-1. 설정 파일 생성
+```bash
+# Template 파일을 복사하여 실제 설정 파일 생성
+cp src/main/resources/application.properties.template src/main/resources/application.properties
+```
+
+### 1-2. 환경변수 설정
+다음 환경변수들을 설정해주세요
+
+```bash
+# 데이터베이스 설정
+export MYSQL_HOST=your-mysql-host
+export MYSQL_DATABASE=your-database-name  
+export MYSQL_USERNAME=your-username
+export MYSQL_PASSWORD=your-password
+
+# 보안 설정
+export ENCRYPTION_KEY=your-32-character-encryption-key
+
+# API 설정
+export API_REQUEST_URL=https://your-domain.com/mock/request
+export API_RETURN_URL=https://your-domain.com/api/protected/webhook
+```
+
+### 2-1. Postman 테스트 리소스
 - Postman 컬렉션: [SimplePG API Tests.postman_collection.json](https://github.com/user-attachments/files/20025718/SimplePG.API.Tests.postman_collection.json)
 - 환경 설정 파일: [ApiAuthentication.postman_environment.json](https://github.com/user-attachments/files/20025719/ApiAuthentication.postman_environment.json)
 
 
-### 환경변수 설정
+### 2-2. 환경변수 설정
 - `BASE_URL`: `http://localhost:8080`
 - `CLIENT_ID`: 가맹점 등록 후 발급받은 ID
 - `SECRET_KEY`: 가맹점 등록 후 발급받은 Secret
