@@ -6,8 +6,8 @@ import me.jaesung.simplepg.common.exception.PaymentException;
 import me.jaesung.simplepg.common.util.HmacUtil;
 import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
 import me.jaesung.simplepg.domain.dto.payment.PaymentDTO;
-import me.jaesung.simplepg.domain.dto.webhook.ExternalApiDTO;
-import me.jaesung.simplepg.domain.dto.webhook.WebhookResponse;
+import me.jaesung.simplepg.domain.dto.webhook.WebhookRequest;
+import me.jaesung.simplepg.domain.dto.webhook.MerchantRequest;
 import me.jaesung.simplepg.domain.vo.api.ApiCredential;
 import me.jaesung.simplepg.mapper.ApiCredentialMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,11 +40,13 @@ public class WebClientService {
 
     /**
      * 외부 결제 시스템으로 결제 요청
+     * 비동기 + 웹훅 (Mono)
+     *
      * @param paymentDTO
      */
     public void sendRequest(PaymentDTO paymentDTO) {
 
-        ExternalApiDTO externalApiDTO = ExternalApiDTO.builder()
+        WebhookRequest webhookRequest = WebhookRequest.builder()
                 .paymentKey(paymentDTO.getPaymentKey())
                 .amount(paymentDTO.getAmount().toString())
                 .orderNo(paymentDTO.getOrderNo())
@@ -56,7 +58,7 @@ public class WebClientService {
 
         webClient.post()
                 .uri(requestApiUrl)
-                .bodyValue(externalApiDTO)
+                .bodyValue(webhookRequest)
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(
@@ -66,26 +68,27 @@ public class WebClientService {
                         }
                 );
     }
-    
+
     /**
      * 외부 결제 시스템으로 결제 취소 요청 전송
-     * @param paymentDTO 취소할 결제 정보
+     *
+     * @param paymentDTO   취소할 결제 정보
      * @param cancelReason 취소 사유(옵션)
      * @throws PaymentException.ExternalPaymentException 외부 API 호출 실패 시
      */
     public void sendCancelRequest(PaymentDTO paymentDTO, String cancelReason) {
         try {
-            log.info("결제 취소 요청 전송: paymentKey={}, transactionId={}", 
+            log.info("결제 취소 요청 전송: paymentKey={}, transactionId={}",
                     paymentDTO.getPaymentKey(), paymentDTO.getTransactionId());
-            
-            ExternalApiDTO cancelRequest = ExternalApiDTO.builder()
+
+            WebhookRequest cancelRequest = WebhookRequest.builder()
                     .paymentKey(paymentDTO.getPaymentKey())
                     .transactionId(paymentDTO.getTransactionId())
                     .amount(paymentDTO.getAmount().toString())
                     .orderNo(paymentDTO.getOrderNo())
                     .cancelReason(cancelReason != null ? cancelReason : "고객 요청에 의한 취소")
                     .build();
-            
+
             // 동기 방식으로 요청 처리 - 취소는 즉시 응답이 필요함
             String response = webClient.post()
                     .uri(cancelUrl)
@@ -93,7 +96,7 @@ public class WebClientService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            
+
             log.debug("결제 취소 응답: {}", response);
         } catch (Exception e) {
             log.error("결제 취소 요청 실패: {}", e.getMessage(), e);
@@ -103,47 +106,52 @@ public class WebClientService {
 
     /**
      * 가맹점 서버에 웹훅 응답 전송
-     * @param webhookResponse
+     *
+     * @param merchantRequest
      * @throws Exception
      */
-    public void sendResponse(WebhookResponse webhookResponse) throws Exception {
+    public void sendResponse(MerchantRequest merchantRequest) throws Exception {
 
-        String data = plusBody(webhookResponse);
-        String clientId = webhookResponse.getClientId();
+        try {
+            String data = plusBody(merchantRequest);
+            String clientId = merchantRequest.getClientId();
 
-        ApiCredential apiCredential = apiCredentialMapper.findByClientId(clientId)
-                .orElseThrow(() -> new ApiException.NotFoundException("해당 clientId가 존재하지 않습니다"));
-        String clientSecret = apiCredential.getClientSecret();
+            ApiCredential apiCredential = apiCredentialMapper.findByClientId(clientId)
+                    .orElseThrow(() -> new ApiException.NotFoundException("해당 clientId가 존재하지 않습니다"));
+            String clientSecret = apiCredential.getClientSecret();
 
-        ApiCredentialResponse apiCredentialResponse = ApiCredentialResponse.of(apiCredential);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("X-CLIENT-ID", clientId);
-        httpHeaders.add("X-TIMESTAMP", LocalDateTime.now().toString());
-        httpHeaders.add("X-SIGNATURE", HmacUtil.generateSignature(data,clientSecret));
+            ApiCredentialResponse apiCredentialResponse = ApiCredentialResponse.of(apiCredential);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-CLIENT-ID", clientId);
+            httpHeaders.add("X-TIMESTAMP", LocalDateTime.now().toString());
+            httpHeaders.add("X-SIGNATURE", HmacUtil.generateSignature(data, clientSecret));
 
-        webClient.post()
-                .uri(apiCredential.getReturnUrl())
-                .headers(h -> h.addAll(httpHeaders))
-                .bodyValue(apiCredentialResponse)
-                .retrieve()
-                .bodyToMono(ApiCredentialResponse.class)
-                .block();
+            webClient.post()
+                    .uri(apiCredential.getReturnUrl())
+                    .headers(h -> h.addAll(httpHeaders))
+                    .bodyValue(apiCredentialResponse)
+                    .retrieve()
+                    .bodyToMono(ApiCredentialResponse.class)
+                    .subscribe(null,null);
 
+        } catch (Exception e) {
+            log.error("가맹점 서버로의 요청 실패: {}", e.getMessage(), e);
+        }
     }
 
-    private String plusBody(WebhookResponse webhookResponse) {
+    private String plusBody(MerchantRequest merchantRequest) {
         try {
-            if (webhookResponse == null) {
+            if (merchantRequest == null) {
                 throw new NullPointerException("webhookResponse가 null입니다");
             }
 
             StringBuffer sb = new StringBuffer();
-            sb.append(webhookResponse.getClientId());
-            sb.append(webhookResponse.getPaymentKey());
-            sb.append(webhookResponse.getAmount());
-            sb.append(webhookResponse.getOrderNo());
-            sb.append(webhookResponse.getCustomerName());
-            sb.append(webhookResponse.getMethodCode());
+            sb.append(merchantRequest.getClientId());
+            sb.append(merchantRequest.getPaymentKey());
+            sb.append(merchantRequest.getAmount());
+            sb.append(merchantRequest.getOrderNo());
+            sb.append(merchantRequest.getCustomerName());
+            sb.append(merchantRequest.getMethodCode());
 
             return sb.toString();
 

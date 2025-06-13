@@ -1,6 +1,6 @@
 package me.jaesung.simplepg.controller.webhook;
 
-import me.jaesung.simplepg.domain.dto.webhook.WebhookRequest;
+import me.jaesung.simplepg.domain.dto.webhook.WebhookResponse;
 import me.jaesung.simplepg.service.webhook.WebhookService;
 import me.jaesung.simplepg.service.webhook.WebhookServiceFactory;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +20,11 @@ public class WebhookController {
     public void webhookProcess(
             @PathVariable String paymentKey,
             @PathVariable String webhookStatus,
-            @RequestBody WebhookRequest webhookRequest) {
+            @RequestBody WebhookResponse webhookResponse) {
 
         WebhookService webhookService = webhookServiceFactory.getWebhookService(webhookStatus);
 
-        webhookService.webhookProcess(webhookRequest, paymentKey);
+        webhookService.webhookProcess(webhookResponse, paymentKey);
 
     }
 

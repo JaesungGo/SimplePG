@@ -3,8 +3,8 @@ package me.jaesung.simplepg.controller.mock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
-import me.jaesung.simplepg.domain.dto.webhook.ExternalApiDTO;
 import me.jaesung.simplepg.domain.dto.webhook.WebhookRequest;
+import me.jaesung.simplepg.domain.dto.webhook.WebhookResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +22,19 @@ public class MockController {
 
     private final WebClient webClient;
 
+    /**
+     * 외부 서버 역할을 하는 Controller입니다.
+     * @param webhookRequest
+     * @return
+     */
     @PostMapping("/request")
-    public ResponseEntity<String> handleMockData(@RequestBody ExternalApiDTO externalApiDTO) {
+    public ResponseEntity<String> handleMockData(@RequestBody WebhookRequest webhookRequest) {
 
+        // transactionId는 랜덤으로 생성
         String transactionId = UUID.randomUUID().toString();
-        String paymentKey = externalApiDTO.getPaymentKey();
+        String paymentKey = webhookRequest.getPaymentKey();
 
-        WebhookRequest webhookRequest = WebhookRequest.builder()
+        WebhookResponse webhookResponse = WebhookResponse.builder()
                 .transactionId(transactionId)
                 .paymentStatus("APPROVED")
                 .approvedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
@@ -40,7 +46,7 @@ public class MockController {
 
                 webClient.post()
                         .uri("http://localhost:8080/api/protected/webhook/" + paymentKey + "/success")
-                        .bodyValue(webhookRequest)
+                        .bodyValue(webhookResponse)
                         .retrieve()
                         .bodyToMono(String.class)
                         .subscribe(

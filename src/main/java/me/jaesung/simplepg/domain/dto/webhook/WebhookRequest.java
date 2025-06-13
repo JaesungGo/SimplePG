@@ -5,10 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @Builder
-@AllArgsConstructor @NoArgsConstructor
+/**
+ * PG -> 외부 결제
+ */
+@Data
+@Builder @AllArgsConstructor @NoArgsConstructor
 public class WebhookRequest {
+
+    private String paymentKey;
+    private String amount;
+    private String orderNo;
+    private String customerName;
+    private String methodCode;
+    private String successUrl;
+    private String failureUrl;
     private String transactionId;
-    private String paymentStatus;
-    private String approvedAt;
+    private String cancelReason;
 }
