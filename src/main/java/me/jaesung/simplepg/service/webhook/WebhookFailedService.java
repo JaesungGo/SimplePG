@@ -10,6 +10,7 @@ import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
 import me.jaesung.simplepg.mapper.PaymentLogMapper;
 import me.jaesung.simplepg.mapper.PaymentMapper;
 import me.jaesung.simplepg.service.webclient.WebClientService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,8 +19,8 @@ import java.time.LocalDateTime;
 @Slf4j
 public class WebhookFailedService extends WebhookServiceImpl {
 
-    public WebhookFailedService(PaymentMapper paymentMapper, PaymentLogMapper paymentLogMapper, WebClientService webClientService) {
-        super(paymentMapper, paymentLogMapper, webClientService);
+    public WebhookFailedService(PaymentMapper paymentMapper, PaymentLogMapper paymentLogMapper, ApplicationEventPublisher eventPublisher) {
+        super(paymentMapper, paymentLogMapper, eventPublisher);
     }
 
     @Override

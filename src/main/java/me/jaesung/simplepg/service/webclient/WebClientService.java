@@ -110,7 +110,7 @@ public class WebClientService {
      * @param merchantRequest
      * @throws Exception
      */
-    public void sendResponse(MerchantRequest merchantRequest) throws Exception {
+    public void sendResponse(MerchantRequest merchantRequest) {
 
         try {
             String data = plusBody(merchantRequest);
@@ -132,7 +132,7 @@ public class WebClientService {
                     .bodyValue(apiCredentialResponse)
                     .retrieve()
                     .bodyToMono(ApiCredentialResponse.class)
-                    .subscribe(null,null);
+                    .subscribe(null, null);
 
         } catch (Exception e) {
             log.error("가맹점 서버로의 요청 실패: {}", e.getMessage(), e);
