@@ -9,13 +9,15 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -30,7 +32,7 @@ import java.time.Duration;
 @MapperScan(basePackages = "me.jaesung.simplepg.mapper")
 @ComponentScan(basePackages = "me.jaesung.simplepg.**")
 @EnableTransactionManagement
-public class AppConfig {
+public class AppConfig implements AsyncConfigurer {
 
     @Value("${spring.datasource.driver-class-name}")
     String driver;
@@ -67,7 +69,7 @@ public class AppConfig {
     }
 
     @Bean
-    public DataSourceTransactionManager transactionManager() {
+    public PlatformTransactionManager transactionManager() {
         return new DataSourceTransactionManager(dataSource());
     }
 
@@ -90,6 +92,9 @@ public class AppConfig {
                 .build();
     }
 
-
+    @Bean
+    public ApplicationEventPublisher applicationEventPublisher(ApplicationContext applicationContext) {
+        return applicationContext;
+    }
 
 }
