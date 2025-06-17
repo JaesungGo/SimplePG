@@ -16,6 +16,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,8 +31,9 @@ import java.time.Duration;
 @PropertySource(value = "classpath:application-${spring.profiles.active}.properties",
         ignoreResourceNotFound = true)
 @MapperScan(basePackages = "me.jaesung.simplepg.mapper")
-@ComponentScan(basePackages = "me.jaesung.simplepg.**")
-@EnableTransactionManagement
+@ComponentScan(basePackages = "me.jaesung.simplepg.**",
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class))
+@EnableTransactionManagement(mode = AdviceMode.PROXY, proxyTargetClass = true)
 public class AppConfig implements AsyncConfigurer {
 
     @Value("${spring.datasource.driver-class-name}")
@@ -69,12 +71,6 @@ public class AppConfig implements AsyncConfigurer {
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(dataSource());
-    }
-
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
@@ -90,6 +86,11 @@ public class AppConfig implements AsyncConfigurer {
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                         .responseTimeout(Duration.ofMillis(60000))))
                 .build();
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean

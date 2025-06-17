@@ -1,10 +1,8 @@
 package me.jaesung.simplepg.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.*;
@@ -15,7 +13,6 @@ import org.springframework.web.servlet.config.annotation.*;
 @PropertySource(value = "classpath:application-${spring.profiles.active}.properties",
         ignoreResourceNotFound = true)
 @ComponentScan(basePackages = "me.jaesung.simplepg.controller")
-@ComponentScan(basePackages = "me.jaesung.simplepg.service")
 public class ServletConfig implements WebMvcConfigurer {
 
     @Value("${server.URI}")
@@ -29,7 +26,6 @@ public class ServletConfig implements WebMvcConfigurer {
                 .addResourceLocations("/resources/assets/");
     }
 
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -42,5 +38,4 @@ public class ServletConfig implements WebMvcConfigurer {
     public MultipartResolver multipartResolver() {
         return new StandardServletMultipartResolver();
     }
-
 }
