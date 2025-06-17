@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -104,14 +105,13 @@ public class WebClientService {
         }
     }
 
+
     /**
      * 가맹점 서버에 웹훅 응답 전송
      *
      * @param merchantRequest
-     * @throws Exception
      */
     public void sendResponse(MerchantRequest merchantRequest) {
-
         try {
             String data = plusBody(merchantRequest);
             String clientId = merchantRequest.getClientId();
@@ -132,10 +132,17 @@ public class WebClientService {
                     .bodyValue(apiCredentialResponse)
                     .retrieve()
                     .bodyToMono(ApiCredentialResponse.class)
-                    .subscribe(null, null);
+                    .doOnSuccess(response -> {
+                        log.info("가맹점 서버 응답 성공: {}", response);
+                    })
+                    .doOnError(error -> {
+                        log.error("가맹점 서버 요청 실패: {}", error.getMessage(), error);
+                    })
+                    .onErrorResume(error -> Mono.empty())
+                    .subscribe();
 
         } catch (Exception e) {
-            log.error("가맹점 서버로의 요청 실패: {}", e.getMessage(), e);
+            log.error("가맹점 서버로의 요청 준비 실패: {}", e.getMessage(), e);
         }
     }
 
