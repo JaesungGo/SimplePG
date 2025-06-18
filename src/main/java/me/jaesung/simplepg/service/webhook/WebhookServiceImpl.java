@@ -10,12 +10,9 @@ import me.jaesung.simplepg.domain.dto.webhook.MerchantRequest;
 import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
 import me.jaesung.simplepg.mapper.PaymentLogMapper;
 import me.jaesung.simplepg.mapper.PaymentMapper;
-import me.jaesung.simplepg.service.webclient.WebClientService;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @Slf4j
 @RequiredArgsConstructor
 public abstract class WebhookServiceImpl implements WebhookService {
@@ -34,11 +31,8 @@ public abstract class WebhookServiceImpl implements WebhookService {
     @Transactional
     @Override
     public void webhookProcess(WebhookResponse webhookResponse, String paymentKey) {
-
         MerchantRequest merchantRequest = paymentTransaction(webhookResponse, paymentKey);
-
         eventPublisher.publishEvent(new PaymentProcessedEvent(merchantRequest));
-
     }
 
     /**
@@ -56,7 +50,6 @@ public abstract class WebhookServiceImpl implements WebhookService {
         }
 
         processPaymentStatus(paymentDTO, webhookResponse);
-
         validatePayment(paymentDTO, webhookResponse);
 
         return MerchantRequest.builder()
@@ -68,7 +61,6 @@ public abstract class WebhookServiceImpl implements WebhookService {
                 .methodCode(paymentDTO.getMethodCode().toString())
                 .build();
     }
-
 
     /**
      * 결제 정보와 웹훅 요청 검증 (Success/Failed에 따라 분기)
