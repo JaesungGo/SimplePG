@@ -2,9 +2,7 @@ package me.jaesung.simplepg.config;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListenerMethodProcessor;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -33,8 +31,4 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    @Bean
-    public EventListenerMethodProcessor eventListenerMethodProcessor() {
-        return new EventListenerMethodProcessor();
-    }
 }
