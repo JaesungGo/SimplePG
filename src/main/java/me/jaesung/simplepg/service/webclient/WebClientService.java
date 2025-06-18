@@ -6,6 +6,7 @@ import me.jaesung.simplepg.common.exception.PaymentException;
 import me.jaesung.simplepg.common.util.HmacUtil;
 import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
 import me.jaesung.simplepg.domain.dto.payment.PaymentDTO;
+import me.jaesung.simplepg.domain.dto.webhook.CancelRequest;
 import me.jaesung.simplepg.domain.dto.webhook.WebhookRequest;
 import me.jaesung.simplepg.domain.dto.webhook.MerchantRequest;
 import me.jaesung.simplepg.domain.vo.api.ApiCredential;
@@ -53,8 +54,7 @@ public class WebClientService {
                 .orderNo(paymentDTO.getOrderNo())
                 .customerName(paymentDTO.getCustomerName())
                 .methodCode(paymentDTO.getMethodCode().toString())
-                .successUrl(returnUrl + "/" + paymentDTO.getPaymentKey() + "/success")
-                .failureUrl(returnUrl + "/" + paymentDTO.getPaymentKey() + "/failure")
+                .returnUrl(returnUrl)
                 .build();
 
         webClient.post()
@@ -62,12 +62,10 @@ public class WebClientService {
                 .bodyValue(webhookRequest)
                 .retrieve()
                 .bodyToMono(String.class)
-                .subscribe(
-                        null,
-                        error -> {
-                            throw new PaymentException.ExternalPaymentException("외부 결제 서버로 요청 실패");
-                        }
-                );
+                .doOnSuccess(response -> log.info("PG -> 외부 결제 시스템 요청 성공: {}", response))
+                .doOnError(error -> log.error("PG -> 외부 결제 시스템 요청 실패: {}", error))
+                .onErrorResume(error -> Mono.empty())
+                .subscribe();
     }
 
     /**
@@ -82,7 +80,7 @@ public class WebClientService {
             log.info("결제 취소 요청 전송: paymentKey={}, transactionId={}",
                     paymentDTO.getPaymentKey(), paymentDTO.getTransactionId());
 
-            WebhookRequest cancelRequest = WebhookRequest.builder()
+            CancelRequest cancelRequest = CancelRequest.builder()
                     .paymentKey(paymentDTO.getPaymentKey())
                     .transactionId(paymentDTO.getTransactionId())
                     .amount(paymentDTO.getAmount().toString())
@@ -132,12 +130,8 @@ public class WebClientService {
                     .bodyValue(apiCredentialResponse)
                     .retrieve()
                     .bodyToMono(ApiCredentialResponse.class)
-                    .doOnSuccess(response -> {
-                        log.info("가맹점 서버 응답 성공: {}", response);
-                    })
-                    .doOnError(error -> {
-                        log.error("가맹점 서버 요청 실패: {}", error.getMessage(), error);
-                    })
+                    .doOnSuccess(response -> log.info("가맹점 서버 응답 성공: {}", response))
+                    .doOnError(error -> log.error("가맹점 서버 요청 실패: {}", error.getMessage(), error))
                     .onErrorResume(error -> Mono.empty())
                     .subscribe();
 

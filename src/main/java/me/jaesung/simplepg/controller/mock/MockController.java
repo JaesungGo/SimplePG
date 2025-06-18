@@ -3,8 +3,10 @@ package me.jaesung.simplepg.controller.mock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
+import me.jaesung.simplepg.domain.dto.webhook.CancelRequest;
 import me.jaesung.simplepg.domain.dto.webhook.WebhookRequest;
 import me.jaesung.simplepg.domain.dto.webhook.WebhookResponse;
+import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ public class MockController {
 
     /**
      * 외부 서버 역할을 하는 Controller입니다.
+     *
      * @param webhookRequest
      * @return
      */
@@ -37,7 +40,7 @@ public class MockController {
         WebhookResponse webhookResponse = WebhookResponse.builder()
                 .transactionId(transactionId)
                 .paymentStatus("APPROVED")
-                .approvedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                 .build();
 
         new Thread(() -> {
@@ -50,17 +53,54 @@ public class MockController {
                         .retrieve()
                         .bodyToMono(String.class)
                         .subscribe(
-                                response -> log.info("웹훅 전송 성공: {}", response),
-                                error -> log.error("웹훅 전송 실패: {}", error.getMessage())
+                                response -> log.info("결제 웹훅 전송 성공: {}", response),
+                                error -> log.error("결제 웹훅 전송 실패: {}", error.getMessage())
                         );
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("웹훅 전송 중 인터럽트 발생", e);
+                log.error("취소 웹훅 전송 중 인터럽트 발생", e);
             }
         }).start();
 
         log.info("Mock 서버가 결제 요청 접수 완료. 트랜잭션 ID: {}", transactionId);
         return ResponseEntity.ok("Payment request received successfully. Transaction ID: " + transactionId);
+    }
+
+    @PostMapping("/request/cancel")
+    public ResponseEntity<String> handleCancelData(@RequestBody CancelRequest cancelRequest) {
+
+        String transactionId = UUID.randomUUID().toString();
+        String paymentKey = cancelRequest.getPaymentKey();
+
+        WebhookResponse webhookResponse = WebhookResponse.builder()
+                .transactionId(transactionId)
+                .paymentStatus(PaymentStatus.CANCELED.toString())
+                .createdAt(LocalDateTime.now().toString())
+                .build();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+
+                webClient.post()
+                        .uri("http://localhost:8080/api/protected/payment" + paymentKey + "/cancel")
+                        .bodyValue(webhookResponse)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .subscribe(
+                                success -> log.info("취소 웹훅 전송 성공: {}",success),
+                                error -> log.error("취소 웹훅 전송 실패: {}", error.getMessage())
+                        );
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("취소 웹훅 전송 중 인터럽트 발생", e);
+            }
+        }).start();
+
+        log.info("Mock 서버가 취소 요청 접수 완료. 트랜잭션 ID: {}", transactionId);
+        return ResponseEntity.ok("Payment cancel request received successfully. Transaction ID: " + transactionId);
+
     }
 
     @PostMapping("/callback1")

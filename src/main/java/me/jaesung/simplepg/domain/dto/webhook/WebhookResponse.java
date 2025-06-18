@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class WebhookResponse {
     private String transactionId;
     private String paymentStatus;
-    private String approvedAt;
+    private String createdAt;
 }

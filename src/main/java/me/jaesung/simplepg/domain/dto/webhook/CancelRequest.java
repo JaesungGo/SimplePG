@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebhookRequest {
+public class CancelRequest {
 
     private String paymentKey;
     private String amount;
@@ -21,5 +21,6 @@ public class WebhookRequest {
     private String methodCode;
     private String returnUrl;
     private String transactionId;
+    private String cancelReason;
 
 }
