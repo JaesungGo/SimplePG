@@ -164,6 +164,7 @@
     </div>
 
     <script>
+        const contextPath = '${pageContext.request.contextPath}';
 
         function quickPaymentRequest() {
             const orderNo = document.getElementById('quickOrderNo').value;
@@ -178,7 +179,7 @@
                 customerName: "빠른 테스트 고객"
             };
 
-            fetch('/api/protected/payment', {
+            fetch(contextPath + '/api/protected/payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -214,7 +215,7 @@
                 return;
             }
 
-            fetch(`/api/protected/payment/${'${paymentKey}'}`, {
+            fetch(contextPath + `/api/protected/payment/${'${paymentKey}'}`, {
                 method: 'GET',
                 headers: {
                     'X-CLIENT-ID': 'test_client_001',
@@ -243,7 +244,7 @@
             try {
                 const requestData = JSON.parse(body);
                 
-                fetch('/api/protected/payment', {
+                fetch(contextPath + '/api/protected/payment', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

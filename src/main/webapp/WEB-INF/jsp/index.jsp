@@ -170,8 +170,8 @@
                 <div class="status-label">서버 상태</div>
             </div>
             <div class="status-item">
-                <div class="status-number">8080</div>
-                <div class="status-label">포트</div>
+                <div class="status-number">Azure</div>
+                <div class="status-label">배포 환경</div>
             </div>
             <div class="status-item">
                 <div class="status-number">Spring</div>

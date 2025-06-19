@@ -327,7 +327,7 @@
 
 <script>
     // 페이지 로드 시 초기화
-    window.onload = function() {
+    window.onload = function () {
         generateTransactionId();
         updateApprovedAt();
         updateWebhookUrl();
@@ -336,6 +336,8 @@
         document.getElementById('webhookPaymentKey').addEventListener('input', updateWebhookUrl);
         document.getElementById('webhookStatus').addEventListener('change', updateWebhookUrl);
     };
+
+    const contextPath = '${pageContext.request.contextPath}';
 
     // Transaction ID 생성
     function generateTransactionId() {
@@ -410,7 +412,7 @@
         addWebhookLog('🔄 웹훅 전송 시작: ' + paymentKey + ' (' + status + ')');
 
         setTimeout(() => {
-            const webhookUrl = '/api/protected/webhook/' + paymentKey + '/' + status;
+            const webhookUrl = contextPath + '/api/protected/webhook/' + paymentKey + '/' + status;
             console.log('Sending webhook to:', webhookUrl);
 
             fetch(webhookUrl, {
@@ -468,7 +470,7 @@
 
         addWebhookLog('🔄 Mock 서버로 결제 요청 전송: ' + paymentKey);
 
-        fetch('/mock/request', {
+        fetch(contextPath + '/mock/request', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
