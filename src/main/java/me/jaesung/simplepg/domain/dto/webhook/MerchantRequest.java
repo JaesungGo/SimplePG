@@ -1,25 +1,20 @@
 package me.jaesung.simplepg.domain.dto.webhook;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * PG -> 외부 결제
+ * PG -> 가맹점
  */
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class WebhookRequest {
+public class MerchantRequest {
 
+    private String clientId;
     private String paymentKey;
     private String amount;
     private String orderNo;
     private String customerName;
     private String methodCode;
-    private String returnUrl;
-    private String transactionId;
 
 }

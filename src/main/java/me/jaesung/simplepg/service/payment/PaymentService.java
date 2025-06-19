@@ -173,6 +173,12 @@ public class PaymentService {
         }
     }
 
+    /**
+     * 결제 생성 메서드
+     * @param request
+     * @param amountBD
+     * @return
+     */
     private PaymentDTO createPayment(PaymentRequest request, BigDecimal amountBD) {
         String paymentId = String.valueOf(UUID.randomUUID());
         String orderNo = request.getOrderNo();
