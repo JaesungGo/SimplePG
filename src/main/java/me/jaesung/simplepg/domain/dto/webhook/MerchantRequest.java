@@ -9,10 +9,12 @@ import lombok.Data;
 @Data
 @Builder
 public class MerchantRequest {
+
     private String clientId;
     private String paymentKey;
     private String amount;
     private String orderNo;
     private String customerName;
     private String methodCode;
+
 }
