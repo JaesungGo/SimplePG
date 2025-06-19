@@ -186,7 +186,7 @@
 
     <!-- 테스트 카드들 -->
     <div class="dashboard">
-        <a href="/payment-test" class="card">
+        <a href="${pageContext.request.contextPath}/payment-test" class="card">
             <div class="card-icon">💳</div>
             <h2>결제 시스템 테스트</h2>
             <p>결제 요청, 상태 조회, 취소, 완료 기능을 테스트할 수 있습니다.</p>
@@ -199,8 +199,8 @@
             </ul>
         </a>
 
-        <a href="/webhook-test" class="card">
-            <div class="card-icon">🔄</div>
+        <a href="${pageContext.request.contextPath}/webhook-test" class="card">
+        <div class="card-icon">🔄</div>
             <h2>웹훅 테스트</h2>
             <p>외부 결제 시스템에서 SimplePG로 웹훅을 보내는 시뮬레이션입니다.</p>
             <ul class="card-features">
@@ -212,8 +212,8 @@
             </ul>
         </a>
 
-        <a href="/api-test" class="card">
-            <div class="card-icon">📚</div>
+        <a href="${pageContext.request.contextPath}/api-test" class="card">
+        <div class="card-icon">📚</div>
             <h2>API 테스트</h2>
             <p>SimplePG API의 상세한 사용법과 예제를 확인할 수 있습니다.</p>
             <ul class="card-features">
