@@ -9,14 +9,14 @@ import me.jaesung.simplepg.domain.vo.payment.PaymentLogAction;
 import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
 import me.jaesung.simplepg.mapper.PaymentLogMapper;
 import me.jaesung.simplepg.mapper.PaymentMapper;
-import me.jaesung.simplepg.service.webclient.WebClientService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
-@Slf4j
+@Slf4j @Transactional
 public class WebhookFailedService extends WebhookServiceImpl {
 
     public WebhookFailedService(PaymentMapper paymentMapper, PaymentLogMapper paymentLogMapper, ApplicationEventPublisher eventPublisher) {

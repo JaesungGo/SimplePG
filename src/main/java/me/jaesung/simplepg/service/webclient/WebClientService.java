@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Service
@@ -31,7 +32,7 @@ public class WebClientService {
 
     public WebClientService(@Value("${api.request.url}") String requestApiUrl,
                             @Value("${api.return.url}") String returnUrl,
-                            @Value("${api.request.url}/cancel}") String cancelUrl,
+                            @Value("${api.request.url}/cancel") String cancelUrl,
                             WebClient webClient, ApiCredentialMapper apiCredentialMapper) {
         this.requestApiUrl = requestApiUrl;
         this.returnUrl = returnUrl;
@@ -70,7 +71,6 @@ public class WebClientService {
 
     /**
      * 외부 결제 시스템으로 결제 취소 요청 전송
-     *
      * @param paymentDTO   취소할 결제 정보
      * @param cancelReason 취소 사유(옵션)
      * @throws PaymentException.ExternalPaymentException 외부 API 호출 실패 시
@@ -94,7 +94,7 @@ public class WebClientService {
                     .bodyValue(cancelRequest)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .block();
+                    .block(Duration.ofSeconds(30));
 
             log.debug("결제 취소 응답: {}", response);
         } catch (Exception e) {

@@ -67,39 +67,28 @@ public class MockController {
     }
 
     @PostMapping("/request/cancel")
-    public ResponseEntity<String> handleCancelData(@RequestBody CancelRequest cancelRequest) {
+    public ResponseEntity<WebhookResponse> handleCancelData(@RequestBody CancelRequest cancelRequest) {
 
-        String transactionId = UUID.randomUUID().toString();
-        String paymentKey = cancelRequest.getPaymentKey();
+        try {
+            Thread.sleep(3000);
 
-        WebhookResponse webhookResponse = WebhookResponse.builder()
-                .transactionId(transactionId)
-                .paymentStatus(PaymentStatus.CANCELED.toString())
-                .createdAt(LocalDateTime.now().toString())
-                .build();
+            String transactionId = UUID.randomUUID().toString();
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
+            WebhookResponse webhookResponse = WebhookResponse.builder()
+                    .transactionId(transactionId)
+                    .paymentStatus(PaymentStatus.CANCELED.toString())
+                    .createdAt(LocalDateTime.now().toString())
+                    .build();
 
-                webClient.post()
-                        .uri("http://localhost:8080/api/protected/payment" + paymentKey + "/cancel")
-                        .bodyValue(webhookResponse)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .subscribe(
-                                success -> log.info("취소 웹훅 전송 성공: {}",success),
-                                error -> log.error("취소 웹훅 전송 실패: {}", error.getMessage())
-                        );
 
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.error("취소 웹훅 전송 중 인터럽트 발생", e);
-            }
-        }).start();
+            log.info("Mock 서버가 취소 요청 접수 완료. 트랜잭션 ID: {}", transactionId);
+            return ResponseEntity.ok(webhookResponse);
 
-        log.info("Mock 서버가 취소 요청 접수 완료. 트랜잭션 ID: {}", transactionId);
-        return ResponseEntity.ok("Payment cancel request received successfully. Transaction ID: " + transactionId);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("취소 처리 중 인터럽트 발생", e);
+            return ResponseEntity.internalServerError().build();
+        }
 
     }
 
