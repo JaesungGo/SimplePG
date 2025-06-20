@@ -7,6 +7,7 @@ import me.jaesung.simplepg.domain.dto.webhook.CancelRequest;
 import me.jaesung.simplepg.domain.dto.webhook.WebhookRequest;
 import me.jaesung.simplepg.domain.dto.webhook.WebhookResponse;
 import me.jaesung.simplepg.domain.vo.payment.PaymentStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/mock")
 public class MockController {
 
     private final WebClient webClient;
+    private final String returnUrl;
+
+    public MockController(WebClient webClient, @Value("${api.return.url}") String returnUrl) {
+        this.webClient = webClient;
+        this.returnUrl = returnUrl;
+    }
 
     /**
      * 외부 서버 역할을 하는 Controller입니다.
@@ -39,7 +45,7 @@ public class MockController {
 
         WebhookResponse webhookResponse = WebhookResponse.builder()
                 .transactionId(transactionId)
-                .paymentStatus("APPROVED")
+                .paymentStatus(PaymentStatus.APPROVED.toString())
                 .createdAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                 .build();
 
@@ -48,7 +54,7 @@ public class MockController {
                 Thread.sleep(1000);
 
                 webClient.post()
-                        .uri("http://localhost:8080/api/protected/webhook/" + paymentKey + "/success")
+                        .uri(returnUrl + "/" + paymentKey + "/success")
                         .bodyValue(webhookResponse)
                         .retrieve()
                         .bodyToMono(String.class)
@@ -77,7 +83,7 @@ public class MockController {
             WebhookResponse webhookResponse = WebhookResponse.builder()
                     .transactionId(transactionId)
                     .paymentStatus(PaymentStatus.CANCELED.toString())
-                    .createdAt(LocalDateTime.now().toString())
+                    .createdAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                     .build();
 
 
