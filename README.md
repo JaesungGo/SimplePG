@@ -92,21 +92,17 @@ simplepg/
 ---
 ## 🧪 테스트 방법
 
-### 🌐 JSP 테스트 페이지 사용법
+### 🌐 배포 환경 테스트 페이지 사용법
 
-애플리케이션 실행 후 브라우저에서 다음 URL로 접속하여 테스트할 수 있습니다
+브라우저에서 다음 URL로 접속하여 테스트할 수 있습니다
 
 #### 📊 메인 대시보드
-```
-http://localhost:8080/
-```
+[🔗 메인 대시보드 접속하기](https://simplepg-backend-f5g2apf5h4efgjd4.koreacentral-01.azurewebsites.net/SimplePG-1.0.0/)
 - 시스템 상태 확인
 - 각 테스트 페이지로 이동하는 네비게이션 제공
 
 #### 💳 결제 시스템 테스트
-```
-http://localhost:8080/payment-test
-```
+[🔗 결제 테스트 페이지](https://simplepg-backend-f5g2apf5h4efgjd4.koreacentral-01.azurewebsites.net/SimplePG-1.0.0/payment-test)
 - **결제 요청**: 새로운 결제 요청 생성 및 Payment Key 발급
 - **결제 상태 조회**: Payment Key로 결제 상태 확인
 - **결제 취소**: 결제 취소 처리 (사유 포함)
@@ -114,9 +110,7 @@ http://localhost:8080/payment-test
 - **최근 결제 내역**: Mock 데이터로 결제 내역 확인
 
 #### 🔄 웹훅 테스트
-```
-http://localhost:8080/webhook-test
-```
+[🔗 웹훅 테스트 페이지](https://simplepg-backend-f5g2apf5h4efgjd4.koreacentral-01.azurewebsites.net/SimplePG-1.0.0/webhook-test)
 - **웹훅 플로우 시각화**: 결제 처리 과정을 단계별로 표시
 - **성공 웹훅 전송**: 외부 결제 시스템에서 성공 결과 전송 시뮬레이션
 - **실패 웹훅 전송**: 외부 결제 시스템에서 실패 결과 전송 시뮬레이션
@@ -124,9 +118,7 @@ http://localhost:8080/webhook-test
 - **실시간 로그**: 웹훅 전송 과정을 실시간으로 모니터링
 
 #### 🔧 API 테스트
-```
-http://localhost:8080/api-test
-```
+[🔗 API 테스트 페이지](https://simplepg-backend-f5g2apf5h4efgjd4.koreacentral-01.azurewebsites.net/SimplePG-1.0.0/api-test)
 - **빠른 테스트**: 간단한 결제 요청 및 상태 조회
 - **JSON 요청 테스트**: 커스텀 JSON으로 API 직접 호출
 - **응답 분석**: API 응답 결과 분석 및 표시
@@ -160,7 +152,7 @@ export API_RETURN_URL=https://your-domain.com/api/protected/webhook
 ```
 
 ### 2-1. Postman 테스트 리소스
-- Postman 컬렉션: [SimplePG API Tests.postman_collection.json](https://github.com/user-attachments/files/20025718/SimplePG.API.Tests.postman_collection.json)
+- Postman 컬렉션: [SimplePG API Tests.postman_collection.json](https://github.com/user-attachments/files/20829045/SimplePG.API.Tests.postman_collection.json)
 - 환경 설정 파일: [ApiAuthentication.postman_environment.json](https://github.com/user-attachments/files/20025719/ApiAuthentication.postman_environment.json)
 
 
