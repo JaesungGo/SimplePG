@@ -25,7 +25,7 @@ public class WebhookFailedService extends WebhookServiceImpl {
 
     @Override
     protected void validatePayment(PaymentDTO paymentDTO, WebhookResponse webhookRequest) {
-        if (!webhookRequest.getPaymentStatus().equals(PaymentStatus.FAILED.toString())) {
+        if (!webhookRequest.getPaymentStatus().equals(PaymentStatus.FAILED.name())) {
             throw new PaymentException.WebhookProcessingException("외부 Status 정보가 서버의 정보와 다릅니다");
         }
     }
@@ -44,5 +44,10 @@ public class WebhookFailedService extends WebhookServiceImpl {
 
         paymentMapper.updatePayment(paymentDTO);
         paymentLogMapper.insertPaymentLog(paymentLogDTO);
+    }
+
+    @Override
+    public String getStrategyName() {
+        return "failed";
     }
 }

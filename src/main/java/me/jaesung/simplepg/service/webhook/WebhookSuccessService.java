@@ -47,4 +47,9 @@ public class WebhookSuccessService extends WebhookServiceImpl {
         paymentMapper.updatePayment(paymentDTO);
         paymentLogMapper.insertPaymentLog(paymentLogDTO);
     }
+
+    @Override
+    public String getStrategyName() {
+        return "success";
+    }
 }

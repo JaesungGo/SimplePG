@@ -2,7 +2,7 @@ package me.jaesung.simplepg.controller.webhook;
 
 import me.jaesung.simplepg.domain.dto.webhook.WebhookResponse;
 import me.jaesung.simplepg.service.webhook.WebhookService;
-import me.jaesung.simplepg.service.webhook.WebhookServiceFactory;
+import me.jaesung.simplepg.service.webhook.WebhookContext;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/protected/webhook")
 public class WebhookController {
 
-    private final WebhookServiceFactory webhookServiceFactory;
+    private final WebhookContext webhookContext;
 
-    public WebhookController(WebhookServiceFactory webhookServiceFactory) {
-        this.webhookServiceFactory = webhookServiceFactory;
+    public WebhookController(WebhookContext webhookContext) {
+        this.webhookContext = webhookContext;
     }
 
     @PostMapping("/{paymentKey}/{webhookStatus}")
@@ -22,7 +22,7 @@ public class WebhookController {
             @PathVariable String webhookStatus,
             @RequestBody WebhookResponse webhookResponse) {
 
-        WebhookService webhookService = webhookServiceFactory.getWebhookService(webhookStatus);
+        WebhookService webhookService = webhookContext.getWebhookService(webhookStatus);
 
         webhookService.webhookProcess(webhookResponse, paymentKey);
 
