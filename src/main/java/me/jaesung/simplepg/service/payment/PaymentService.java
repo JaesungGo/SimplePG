@@ -2,6 +2,7 @@ package me.jaesung.simplepg.service.payment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.jaesung.simplepg.common.exception.ErrorCode;
 import me.jaesung.simplepg.common.exception.PaymentException;
 import me.jaesung.simplepg.domain.dto.payment.*;
 import me.jaesung.simplepg.domain.vo.payment.MethodCode;
@@ -26,6 +27,7 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
     private final PaymentLogMapper paymentLogMapper;
     private final WebClientService webClientService;
+    private final PaymentKeyService paymentKeyService;
 
     @Transactional
     public PaymentResponse createPaymentAndLog(PaymentRequest request) {
@@ -140,23 +142,23 @@ public class PaymentService {
             throw new PaymentException.ProcessingException("결제 완료 처리 중 오류가 발생했습니다");
         }
     }
-    
+
     /**
      * 결제 상태 전이 유효성 검증 메소드
      * 허용된 상태 전이만 가능하도록 제한
      */
     private void validatePaymentStatusTransition(PaymentStatus currentStatus, PaymentStatus targetStatus) {
         boolean isValid = false;
-        
+
         switch (currentStatus) {
             case READY:
                 isValid = targetStatus == PaymentStatus.APPROVED ||
-                          targetStatus == PaymentStatus.FAILED ||
-                          targetStatus == PaymentStatus.CANCELED;
+                        targetStatus == PaymentStatus.FAILED ||
+                        targetStatus == PaymentStatus.CANCELED;
                 break;
             case APPROVED:
                 isValid = targetStatus == PaymentStatus.COMPLETED ||
-                          targetStatus == PaymentStatus.CANCELED;
+                        targetStatus == PaymentStatus.CANCELED;
                 break;
             case COMPLETED:
                 isValid = targetStatus == PaymentStatus.CANCELED;
@@ -166,7 +168,7 @@ public class PaymentService {
                 isValid = false;
                 break;
         }
-        
+
         if (!isValid) {
             throw new PaymentException.InvalidPaymentRequestException(
                     String.format("유효하지 않은 상태 전이입니다: %s → %s", currentStatus, targetStatus));
@@ -175,6 +177,7 @@ public class PaymentService {
 
     /**
      * 결제 생성 메서드
+     *
      * @param request
      * @param amountBD
      * @return
@@ -182,7 +185,7 @@ public class PaymentService {
     private PaymentDTO createPayment(PaymentRequest request, BigDecimal amountBD) {
         String paymentId = String.valueOf(UUID.randomUUID());
         String orderNo = request.getOrderNo();
-        String paymentKey = createPaymentKey(orderNo);
+        String paymentKey = paymentKeyService.createPaymentKey(orderNo);
         MethodCode methodCodeEnum = MethodCode.valueOf(request.getMethodCode());
 
 
@@ -210,18 +213,11 @@ public class PaymentService {
                 .build();
     }
 
-    private String createPaymentKey(String orderNo) {
-        String timeStamp = String.valueOf(System.currentTimeMillis());
-        String randomSalt = UUID.randomUUID().toString();
-        String data = orderNo + ":" + timeStamp + ":" + randomSalt;
 
-        return DigestUtils.sha256Hex(data);
-    }
-
-    private void validateClientId(PaymentRequest request){
+    private void validateClientId(PaymentRequest request) {
         String clientId = request.getClientId();
 
-        if(clientId == null || clientId.trim().isEmpty()){
+        if (clientId == null || clientId.trim().isEmpty()) {
             throw new PaymentException.InvalidPaymentRequestException("클라이언트 ID는 필수입니다");
         }
     }
@@ -243,15 +239,24 @@ public class PaymentService {
     }
 
     /**
-     * 금액 검증 (0보다 작은 경우 예외)
+     * 금액 검증 (0보다 작은 경우 예외, 소수점 불가)
      * 검증한 값을 그대로 사용해서 불필요한 메모리 낭비 줄임
      */
     private BigDecimal validateAmount(PaymentRequest request) {
         try {
             BigDecimal amount = new BigDecimal(request.getAmount());
-            if (amount.compareTo(BigDecimal.ZERO) < 0) {
-                throw new PaymentException.InvalidPaymentRequestException("금액이 0보다 작습니다");
+
+            // 1. 0원 이하 결제 차단
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new PaymentException.InvalidPaymentRequestException("금액이 0보다 같거나 작습니다");
             }
+
+            // 2. 소수점 처리 - 정수만 허용
+            if (amount.scale() > 0) {
+                throw new PaymentException.InvalidPaymentRequestException(
+                        "결제 금액은 정수만 허용됩니다");
+            }
+
             return amount;
         } catch (NumberFormatException e) {
             throw new PaymentException.InvalidPaymentRequestException("유효한 금액 형식이 아닙니다");
