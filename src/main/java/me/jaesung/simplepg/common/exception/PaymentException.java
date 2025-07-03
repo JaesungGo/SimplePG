@@ -48,4 +48,14 @@ public class PaymentException extends RuntimeException{
     public static class WebhookSendingException extends PaymentException{
         public WebhookSendingException(String message) {super(ErrorCode.BAD_GATEWAY, message);}
     }
+
+    public static class DataAccessException extends PaymentException{
+        public DataAccessException(String message) {super(ErrorCode.INTERNAL_SERVER_ERROR, message);}
+    }
+
+    public static class ExpiredRequestException extends ApiException {
+        public ExpiredRequestException(String message) {
+            super(ErrorCode.REQUEST_TIMEOUT, message);
+        }
+    }
 }
