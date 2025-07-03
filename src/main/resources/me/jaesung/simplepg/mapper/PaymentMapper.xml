@@ -23,8 +23,12 @@
         UPDATE PAYMENT SET status = #{status}, approved_at = #{approvedAt}, transaction_id = #{transactionId} WHERE payment_id = #{paymentId}
     </update>
 
-    <select id="lockByOrderNo" parameterType="string" resultType="boolean">
-        SELECT 1 FROM PAYMENT WHERE order_no = #{orderNo} FOR UPDATE
+    <select id="lockByClientIdAndOrderNo" parameterType="string" resultType="boolean">
+        SELECT 1 FROM PAYMENT WHERE client_id = #{clientId} and order_no = #{orderNo} FOR UPDATE
+    </select>
+
+    <select id="existsByClientIdAndOrderNo" parameterType="string" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM PAYMENT WHERE client_id = #{clientId} AND order_no = #{orderNo})
     </select>
 
 

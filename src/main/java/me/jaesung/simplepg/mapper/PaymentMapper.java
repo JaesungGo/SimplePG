@@ -9,7 +9,9 @@ public interface PaymentMapper {
 
     boolean existsByOrderNo(String orderNo);
 
-    Boolean lockByOrderNo(String orderNo);
+    boolean existsByClientIdAndOrderNo(String clientId, String orderNo);
+
+    Boolean lockByClientIdAndOrderNo(String clientId, String orderNo);
 
     Optional<PaymentDTO> findByPaymentKeyWithLock(String paymentKey);
 

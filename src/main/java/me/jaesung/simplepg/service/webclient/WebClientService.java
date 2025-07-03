@@ -43,7 +43,7 @@ public class WebClientService {
 
     /**
      * 외부 결제 시스템으로 결제 요청
-     * 비동기 + 웹훅 (Mono)
+     * 동기 + 웹훅 (Mono(String))
      *
      * @param paymentDTO
      */
@@ -63,10 +63,7 @@ public class WebClientService {
                 .bodyValue(webhookRequest)
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnSuccess(response -> log.info("PG -> 외부 결제 시스템 요청 성공: {}", response))
-                .doOnError(error -> log.error("PG -> 외부 결제 시스템 요청 실패: {}", error))
-                .onErrorResume(error -> Mono.empty())
-                .subscribe();
+                .block(Duration.ofSeconds(3));
     }
 
     /**
