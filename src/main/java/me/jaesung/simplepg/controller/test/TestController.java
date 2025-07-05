@@ -1,17 +1,19 @@
-package me.jaesung.simplepg.controller;
+package me.jaesung.simplepg.controller.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @Slf4j
+@RequestMapping("/test")
 public class TestController {
 
     /**
      * 메인 대시보드 페이지
      */
-    @GetMapping("/")
+    @GetMapping()
     public String index() {
         log.info("메인 대시보드 페이지 요청");
         return "index";
