@@ -40,8 +40,6 @@ public class PaymentService {
 
         validateMethodCode(request.getMethodCode());
 
-        paymentMapper.lockByClientIdAndOrderNo(request.getClientId(), request.getOrderNo());
-
         validateClientIdAndOrderNo(request.getClientId(), request.getOrderNo());
 
         try {
