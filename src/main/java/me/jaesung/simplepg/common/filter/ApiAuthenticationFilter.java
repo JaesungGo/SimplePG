@@ -1,5 +1,6 @@
-package me.jaesung.simplepg.common.util.filter;
+package me.jaesung.simplepg.common.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import me.jaesung.simplepg.common.exception.ApiException;
 import me.jaesung.simplepg.common.util.HmacUtil;
 import me.jaesung.simplepg.domain.dto.api.ApiCredentialResponse;
@@ -7,7 +8,10 @@ import me.jaesung.simplepg.domain.vo.api.ApiStatus;
 import me.jaesung.simplepg.service.api.ApiCredentialService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,8 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
-@Component
+@Slf4j
 public class ApiAuthenticationFilter extends OncePerRequestFilter {
 
     private final ApiCredentialService apiCredentialService;
@@ -32,7 +37,7 @@ public class ApiAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (request.getRequestURI().startsWith("/api/v1")) {
+        if (!request.getRequestURI().startsWith("/api/protected")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -53,6 +58,15 @@ public class ApiAuthenticationFilter extends OncePerRequestFilter {
         if (credential == null || !ApiStatus.ACTIVE.equals(credential.getStatus())) {
             throw new ApiException.ApiAuthenticationException("Invalid API credential");
         }
+
+        // 인증 객체 생성 (clientId : ROLE_API_CLIENT)
+        Authentication roleApiClient = new PreAuthenticatedAuthenticationToken(
+                clientId,
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_API_CLIENT"))
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(roleApiClient);
 
         String requestBody = getRequestBody(request);
         String method = request.getMethod();
