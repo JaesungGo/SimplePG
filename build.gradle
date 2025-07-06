@@ -42,6 +42,10 @@ dependencies {
     implementation "org.springframework.retry:spring-retry:${retryVersion}"
     implementation "org.springframework:spring-aspects:${springVersion}"
 
+    // Spring Cache
+    implementation "org.springframework:spring-context-support:${springVersion}"
+    implementation "com.github.ben-manes.caffeine:caffeine:2.9.3"
+
     // Spring Webflux
     implementation 'io.projectreactor:reactor-core:3.4.0'
     implementation 'org.springframework:spring-webflux:5.3.10'
