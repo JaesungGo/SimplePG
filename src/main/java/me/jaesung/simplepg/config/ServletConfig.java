@@ -22,11 +22,11 @@ public class ServletConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/resources/**")
-                .addResourceLocations("/resources/");
+                .addResourceLocations("classpath:/static/resources/", "/resources/");
         registry.addResourceHandler("/assets/**")
-                .addResourceLocations("/resources/assets/");
+                .addResourceLocations("classpath:/static/assets/", "/resources/assets/");
         registry.addResourceHandler("/static/**")
-                .addResourceLocations("/static/");
+                .addResourceLocations("classpath:/static/", "/static/");
     }
 
     @Override
